@@ -113,8 +113,7 @@ h1 {
 }
 
 .theme-toggle {
-  height: 40px;
-  width: 40px;
+  padding: 7px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
