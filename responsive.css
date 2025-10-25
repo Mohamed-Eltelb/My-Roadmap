@@ -1,0 +1,44 @@
+@media (max-width: 768px) {
+  .main-content {
+    grid-template-columns: 1fr;
+  }
+  .header-tools {
+    flex-direction: row-reverse;
+  }
+  .roadmap-header {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .roadmap-item {
+    flex-direction: column;
+    /* gap: 10px; */
+  }
+  .roadmap-title {
+    display: none;
+  }
+  .more-wrapper .btn {
+    display: none;
+  }
+  .more-options-mobile {
+    display: flex;
+  }
+  .more-item {
+    display: flex;
+  }
+  .grid-view .roadmap-item {
+    width: 100%;
+  }
+}
+
+@media (min-width: 768px) {
+  .roadmap-container {
+    background: var(--bg-secondary);
+    border-radius: 16px;
+    padding: 25px;
+    box-shadow: var(--glass-shadow);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(18px) saturate(160%);
+    -webkit-backdrop-filter: blur(18px) saturate(160%);
+    user-select: none;
+  }
+}
