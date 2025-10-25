@@ -28,6 +28,10 @@
   .grid-view .roadmap-item {
     width: 100%;
   }
+  .bubble:nth-child(3) {
+  --x: 5%;
+  --y: 65%;
+}
 }
 
 @media (min-width: 768px) {
@@ -40,5 +44,23 @@
     backdrop-filter: blur(18px) saturate(160%);
     -webkit-backdrop-filter: blur(18px) saturate(160%);
     user-select: none;
+  }
+}
+
+/* Responsive tweaks for hero */
+@media (max-width: 768px) {
+  .hero-header {
+    padding-top: 60px;
+    padding-bottom: 40px;
+  }
+  .hero-actions {
+    gap: 8px;
+  }
+}
+
+@media (max-width: 520px) {
+  .btn-lg {
+    width: 100%;
+    justify-content: center;
   }
 }

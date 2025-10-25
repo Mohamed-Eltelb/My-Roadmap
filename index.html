@@ -16,12 +16,27 @@
 
 <body>
     <div class="container">
-        <header>
+        <header class="hero-header">
+            <div class="badge">Interactive • Personal</div>
             <h1>My Learning Roadmap</h1>
             <p class="subtitle">Track your progress and achieve your development goals</p>
-            <div class="header-actions">
-                
+            <div class="hero-actions">
+                <button class="btn btn-primary btn-lg" data-open-add>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M12 5a1 1 0 0 1 1 1v5h5a1 1 0 1 1 0 2h-5v5a1 1 0 1 1-2 0v-5H6a1 1 0 1 1 0-2h5V6a1 1 0 0 1 1-1"/></svg>
+                    Add your first item
+                </button>
+                <button href="#roadmapItems" class="btn btn-outline btn-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M2 12c0 5.523 4.477 10 10 10s10-4.477 10-10S17.523 2 12 2S2 6.477 2 12m13.53.47a.75.75 0 0 1 0 1.06l-3 3a.75.75 0 0 1-1.06 0l-3-3a.75.75 0 1 1 1.06-1.06l1.72 1.72V8a.75.75 0 0 1 1.5 0v6.19l1.72-1.72a.75.75 0 0 1 1.06 0" clip-rule="evenodd"/></svg>
+                    Jump to roadmap
+                </button>
             </div>
+            <div class="floating-icons" aria-hidden="true">
+                <span class="bubble" style=""><i class="fab fa-html5" style="color:#e34f26"></i></span>
+                <span class="bubble" style=""><i class="fab fa-css3-alt" style="color:#1572b6"></i></span>
+                <span class="bubble" style=""><i class="fab fa-js" style="color:#f7df1e"></i></span>
+                <span class="bubble" style=""><i class="fab fa-react" style="color:#61dafb"></i></span>
+            </div>
+            <div class="header-actions"></div>
         </header>
 
         <div class="main-content">
@@ -113,7 +128,7 @@
                             <input type="text" id="customLanguageName" placeholder="e.g., Go, Rust, SQL">
                         </div>
 
-                        <div class="form-group" style="margin-bottom: 0 !important;">
+                        <div class="form-group form-submit">
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-plus"></i> Add to Roadmap
                             </button>
