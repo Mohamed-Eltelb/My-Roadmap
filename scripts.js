@@ -172,7 +172,7 @@ document.addEventListener("DOMContentLoaded", function () {
   changeViewBtn.addEventListener("click", toggleView);
 
   function toggleView() {
-    if (roadmapItems.contains(emptyState)) return;
+    if (!roadmapItems) return;
     let isGridView = roadmapItems.classList.contains("grid-view");
     roadmapItems.classList.toggle("grid-view");
     changeViewBtn.innerHTML = isGridView
