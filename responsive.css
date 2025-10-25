@@ -29,9 +29,15 @@
     width: 100%;
   }
   .bubble:nth-child(3) {
-  --x: 5%;
-  --y: 65%;
-}
+    --x: 5%;
+    --y: 65%;
+  }
+  .icons i,
+  .icons .more-icons {
+    width: 28px;
+    height: 28px;
+    font-size: 15px;
+  }
 }
 
 @media (min-width: 768px) {

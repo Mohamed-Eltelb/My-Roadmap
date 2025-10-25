@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const addItemForm = document.getElementById("addItemForm");
   const itemForm = document.getElementById("itemForm");
   const languageSelect = document.getElementById("languageSelect");
-  const languagesGrid = document.getElementById("languagesGrid");
+  const languageSuggestions = document.getElementById("languageSuggestions");
   const progressFill = document.getElementById("progressFill");
   const progressPercent = document.getElementById("progressPercent");
   const addItemBtn = document.getElementById("addItemBtn");
@@ -17,6 +17,13 @@ document.addEventListener("DOMContentLoaded", function () {
   const customLanguageName = document.getElementById("customLanguageName");
   const searchInput = document.getElementById("searchInput");
   const changeViewBtn = document.getElementById("changeViewBtn");
+  const statsContainer = document.getElementById("statsContainer");
+  const totalStat = document.getElementById("totalStat");
+  const completedStat = document.getElementById("completedStat");
+  const inProgressStat = document.getElementById("inProgressStat");
+  const totalItems = document.getElementById("totalItems");
+  const completedItems = document.getElementById("completedItems");
+  const inProgressItems = document.getElementById("inProgressItems");
   let draggingId = null;
   let searchQuery = "";
   let defaultEmptyHTML = null;
@@ -28,15 +35,235 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Language icons mapping
   const languageIcons = {
+    // Core web
     html: '<i class="fab fa-html5" style="color: #e34f26;"></i>',
     css: '<i class="fab fa-css3-alt" style="color: #1572b6;"></i>',
     javascript: '<i class="fab fa-js-square" style="color: #f7df1e;"></i>',
-    python: '<i class="fab fa-python" style="color: #3776ab;"></i>',
-    java: '<i class="fab fa-java" style="color: #007396;"></i>',
+    js: '<i class="fab fa-js-square" style="color: #f7df1e;"></i>',
+    typescript: '<i class="fas fa-code" style="color: #3178c6;"></i>',
+    ts: '<i class="fas fa-code" style="color: #3178c6;"></i>',
+
+    // Front-end frameworks & libs
     react: '<i class="fab fa-react" style="color: #61dafb;"></i>',
+    "react-native": '<i class="fab fa-react" style="color: #61dafb;"></i>',
+    nextjs: '<i class="fas fa-arrow-right" style="color: #000000;"></i>',
+    remix: '<i class="fas fa-route" style="color: #2e2e2e;"></i>',
+    astro: '<i class="fas fa-star" style="color: #ff5d01;"></i>',
+    vue: '<i class="fab fa-vuejs" style="color: #42b883;"></i>',
+    nuxtjs: '<i class="fas fa-mountain" style="color: #00dc82;"></i>',
+    angular: '<i class="fab fa-angular" style="color: #dd0031;"></i>',
+    svelte: '<i class="fab fa-svelte" style="color: #ff3e00;"></i>',
+    solidjs: '<i class="fas fa-gem" style="color: #2c4f7c;"></i>',
+    jquery: '<i class="fas fa-code" style="color: #0769ad;"></i>',
+    bootstrap: '<i class="fab fa-bootstrap" style="color: #7952b3;"></i>',
+    tailwind: '<i class="fas fa-wind" style="color: #38b2ac;"></i>',
+    sass: '<i class="fab fa-sass" style="color: #cc6699;"></i>',
+    less: '<i class="fas fa-less-than" style="color: #2b4c80;"></i>',
+    postcss: '<i class="fas fa-magic" style="color: #dd3a0a;"></i>',
+    materialui: '<i class="fas fa-layer-group" style="color: #007fff;"></i>',
+    chakraui: '<i class="fas fa-shapes" style="color: #319795;"></i>',
+    "ant-design": '<i class="fas fa-border-all" style="color: #1677ff;"></i>',
+    radix: '<i class="fas fa-cubes" style="color: #111827;"></i>',
+
+    // Runtime & tooling
     node: '<i class="fab fa-node-js" style="color: #339933;"></i>',
+    nodejs: '<i class="fab fa-node-js" style="color: #339933;"></i>',
+    deno: '<i class="fas fa-terminal" style="color: #000000;"></i>',
+    bun: '<i class="fas fa-bolt" style="color: #fbf0df;"></i>',
+    vite: '<i class="fas fa-bolt" style="color: #646cff;"></i>',
+    webpack: '<i class="fab fa-webpack" style="color: #8dd6f9;"></i>',
+    rollup: '<i class="fas fa-circle-notch" style="color: #ef3335;"></i>',
+    parcel: '<i class="fas fa-box-open" style="color: #f2994a;"></i>',
+    babel: '<i class="fas fa-bolt" style="color: #f9dc3e;"></i>',
+    eslint: '<i class="fas fa-check-double" style="color: #4b32c3;"></i>',
+    prettier: '<i class="fas fa-paint-brush" style="color: #f7b93e;"></i>',
+    npm: '<i class="fab fa-npm" style="color: #cb3837;"></i>',
+    yarn: '<i class="fab fa-yarn" style="color: #2c8ebb;"></i>',
+    pnpm: '<i class="fas fa-boxes" style="color: #f69220;"></i>',
+
+    // Back-end languages & frameworks
+    python: '<i class="fab fa-python" style="color: #3776ab;"></i>',
+    django: '<i class="fas fa-leaf" style="color: #092e20;"></i>',
+    flask: '<i class="fas fa-flask" style="color: #000000;"></i>',
+    fastapi: '<i class="fas fa-rocket" style="color: #009688;"></i>',
+    java: '<i class="fab fa-java" style="color: #007396;"></i>',
+    spring: '<i class="fas fa-leaf" style="color: #6db33f;"></i>',
+    kotlin: '<i class="fas fa-code" style="color: #0095d5;"></i>',
+    scala: '<i class="fas fa-code" style="color: #dc322f;"></i>',
+    go: '<i class="fas fa-code" style="color: #00add8;"></i>',
+    rust: '<i class="fas fa-gears" style="color: #dea584;"></i>',
+    php: '<i class="fab fa-php" style="color: #777bb4;"></i>',
+    laravel: '<i class="fab fa-laravel" style="color: #ff2d20;"></i>',
+    symfony: '<i class="fab fa-symfony" style="color: #000000;"></i>',
+    ruby: '<i class="fas fa-gem" style="color: #cc342d;"></i>',
+    rails: '<i class="fas fa-gem" style="color: #cc0000;"></i>',
+    c: '<i class="fas fa-code" style="color: #a8b9cc;"></i>',
+    "c++": '<i class="fas fa-code" style="color: #00599c;"></i>',
+    "c#": '<i class="fas fa-code" style="color: #239120;"></i>',
+    ".net": '<i class="fab fa-microsoft" style="color: #512bd4;"></i>',
+    aspnet: '<i class="fab fa-microsoft" style="color: #5c2d91;"></i>',
+    fsharp: '<i class="fas fa-code" style="color: #378bba;"></i>',
+    elixir: '<i class="fas fa-droplet" style="color: #4b275f;"></i>',
+    phoenix: '<i class="fas fa-feather" style="color: #f25d0e;"></i>',
+    erlang: '<i class="fas fa-code" style="color: #a90533;"></i>',
+
+    // Mobile & desktop
+    android: '<i class="fab fa-android" style="color: #3ddc84;"></i>',
+    ios: '<i class="fab fa-apple" style="color: #000000;"></i>',
+    swift: '<i class="fas fa-code" style="color: #f05138;"></i>',
+    "objective-c": '<i class="fas fa-code" style="color: #438eff;"></i>',
+    flutter: '<i class="fas fa-mobile-alt" style="color: #02569b;"></i>',
+    ionic: '<i class="fas fa-circle" style="color: #3880ff;"></i>',
+    capacitor: '<i class="fas fa-bolt" style="color: #2e2e2e;"></i>',
+    electron: '<i class="fas fa-atom" style="color: #47848f;"></i>',
+    tauri: '<i class="fas fa-desktop" style="color: #24c8db;"></i>',
+
+    // Data & databases
+    mysql: '<i class="fas fa-database" style="color: #4479a1;"></i>',
+    mariadb: '<i class="fas fa-database" style="color: #1f305f;"></i>',
+    postgresql: '<i class="fas fa-database" style="color: #336791;"></i>',
+    sqlite: '<i class="fas fa-database" style="color: #003b57;"></i>',
+    mongodb: '<i class="fas fa-leaf" style="color: #47a248;"></i>',
+    redis: '<i class="fas fa-database" style="color: #dc382d;"></i>',
+    firebase: '<i class="fas fa-fire" style="color: #ffca28;"></i>',
+    supabase: '<i class="fas fa-leaf" style="color: #3ecf8e;"></i>',
+    graphql: '<i class="fas fa-project-diagram" style="color: #e10098;"></i>',
+    prisma: '<i class="fas fa-cube" style="color: #0c344b;"></i>',
+    sequelize: '<i class="fas fa-database" style="color: #52b0e7;"></i>',
+    typeorm: '<i class="fas fa-database" style="color: #e34f26;"></i>',
+    mongoose: '<i class="fas fa-leaf" style="color: #47a248;"></i>',
+
+    // DevOps & cloud
+    aws: '<i class="fab fa-aws" style="color: #ff9900;"></i>',
+    azure: '<i class="fab fa-microsoft" style="color: #0078d4;"></i>',
+    gcp: '<i class="fab fa-google" style="color: #4285f4;"></i>',
+    vercel: '<i class="fas fa-play" style="color: #000000;"></i>',
+    netlify: '<i class="fas fa-cloud" style="color: #00ad9f;"></i>',
+    docker: '<i class="fab fa-docker" style="color: #2496ed;"></i>',
+    kubernetes: '<i class="fas fa-dharmachakra" style="color: #326ce5;"></i>',
+    nginx: '<i class="fas fa-server" style="color: #269539;"></i>',
+    apache: '<i class="fas fa-feather" style="color: #d22128;"></i>',
+    terraform: '<i class="fas fa-cubes" style="color: #7b42bc;"></i>',
+
+    // VCS & platforms
+    git: '<i class="fab fa-git-alt" style="color: #f05032;"></i>',
+    github: '<i class="fab fa-github" style="color: #000000;"></i>',
+    gitlab: '<i class="fab fa-gitlab" style="color: #fc6d26;"></i>',
+    bitbucket: '<i class="fab fa-bitbucket" style="color: #205081;"></i>',
+    jenkins: '<i class="fab fa-jenkins" style="color: #d33833;"></i>',
+    travis: '<i class="fas fa-traffic-light" style="color: #3eaaaf;"></i>',
+    circleci: '<i class="fas fa-circle" style="color: #343434;"></i>',
+
+    // Testing
+    jest: '<i class="fas fa-vial" style="color: #c21325;"></i>',
+    mocha: '<i class="fas fa-mug-hot" style="color: #8d6748;"></i>',
+    chai: '<i class="fas fa-mug-hot" style="color: #a30701;"></i>',
+    cypress: '<i class="fas fa-dot-circle" style="color: #2f2e2e;"></i>',
+    playwright: '<i class="fas fa-theater-masks" style="color: #2f2e2e;"></i>',
+
+    // Data science & ML
+    numpy: '<i class="fas fa-superscript" style="color: #013243;"></i>',
+    pandas: '<i class="fas fa-table" style="color: #150458;"></i>',
+    matplotlib: '<i class="fas fa-chart-line" style="color: #11557c;"></i>',
+    jupyter: '<i class="fas fa-book" style="color: #f37726;"></i>',
+    tensorflow: '<i class="fas fa-brain" style="color: #ff6f00;"></i>',
+    pytorch: '<i class="fas fa-fire" style="color: #ee4c2c;"></i>',
+
+    // Visualization & misc
+    threejs: '<i class="fas fa-cubes" style="color: #000000;"></i>',
+    d3js: '<i class="fas fa-chart-bar" style="color: #f37a20;"></i>',
+    electronjs: '<i class="fas fa-atom" style="color: #47848f;"></i>',
+    wasm: '<i class="fas fa-microchip" style="color: #654ff0;"></i>',
+    graphqlapollo: '<i class="fas fa-atom" style="color: #311c87;"></i>',
+
+    // CMS & platforms
+    wordpress: '<i class="fab fa-wordpress" style="color: #21759b;"></i>',
+    drupal: '<i class="fab fa-drupal" style="color: #0678be;"></i>',
+    joomla: '<i class="fab fa-joomla" style="color: #5091cd;"></i>',
+    magento: '<i class="fab fa-magento" style="color: #ec672c;"></i>',
+    shopify: '<i class="fab fa-shopify" style="color: #95bf47;"></i>',
+
+    // Generic fallback
     custom: '<i class="fas fa-code" style="color: #a1a1aa;"></i>',
   };
+
+  const aliasMap = {
+    "react.js": "react",
+    reactjs: "react",
+    "react native": "react-native",
+    next: "nextjs",
+    "next.js": "nextjs",
+    nuxt: "nuxtjs",
+    "nuxt.js": "nuxtjs",
+    solid: "solidjs",
+    three: "threejs",
+    d3: "d3js",
+    "node.js": "node",
+    nodejs: "node",
+    ts: "typescript",
+    js: "javascript",
+    postgres: "postgresql",
+    postgre: "postgresql",
+    mongo: "mongodb",
+    sqlite3: "sqlite",
+    tailwindcss: "tailwind",
+    "material-ui": "materialui",
+    mui: "materialui",
+    cpp: "c++",
+    csharp: "c#",
+    "f#": "fsharp",
+    "objective c": "objective-c",
+    dotnet: ".net",
+    "asp.net": "aspnet",
+  };
+
+  // Helper to resolve icon by language/framework name, with light normalization and aliases
+  function iconForLanguage(name) {
+    if (!name) return languageIcons.custom;
+    const raw = String(name).trim();
+    const key = raw.toLowerCase();
+    if (languageIcons[key]) return languageIcons[key];
+
+    const aliased = aliasMap[key];
+    if (aliased && languageIcons[aliased]) return languageIcons[aliased];
+    return languageIcons.custom;
+  }
+
+  if (languageSelect)
+    languageSelect.addEventListener("input", function () {
+      const val = this.value;
+      const icon = iconForLanguage(val);
+      languageIcon.innerHTML = icon;
+      languageSuggestions.innerHTML = "";
+      if (!val) {
+        languageSuggestions.style.display = "none";
+        return;
+      } else {
+        languageSuggestions.style.display = "block";
+
+        const suggestions = Object.keys(languageIcons)
+          .filter((key) => key.includes(val.toLowerCase()) && key !== "custom")
+          .slice(0, 5);
+
+        if (suggestions.length === 0) {
+          languageSuggestions.style.display = "none";
+          return;
+        }
+        suggestions.forEach((suggestion) => {
+          const icon = iconForLanguage(suggestion);
+          const div = document.createElement("div");
+          div.classList.add("suggestion");
+          div.innerHTML += `${icon} ${suggestion}`;
+          div.addEventListener("click", () => {
+            languageSelect.value = suggestion;
+            languageSuggestions.innerHTML = "";
+            languageSuggestions.style.display = "none";
+            languageIcon.innerHTML = icon;
+          });
+          languageSuggestions.appendChild(div);
+        });
+      }
+    });
 
   // Initialize the app
   function init() {
@@ -48,6 +275,7 @@ document.addEventListener("DOMContentLoaded", function () {
     items = loadItems();
     renderItems();
     updateProgress();
+    updateStats();
     if (roadmapItems) roadmapItems.setAttribute("role", "list");
 
     // Open modal when Add Item button is clicked
@@ -244,7 +472,7 @@ document.addEventListener("DOMContentLoaded", function () {
     itemDiv.setAttribute("aria-grabbed", "false");
     itemDiv.draggable = true;
 
-    const iconHTML = languageIcons[item.language] || languageIcons.custom;
+    const iconHTML = iconForLanguage(item.language);
 
     itemDiv.innerHTML = `
                     <div class="item-header">
@@ -431,6 +659,7 @@ document.addEventListener("DOMContentLoaded", function () {
     items.splice(targetIndex, 0, moved);
     renderItems();
     updateProgress();
+    updateStats();
     saveItems();
   }
 
@@ -488,6 +717,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     renderItems();
     updateProgress();
+    updateStats();
     saveItems();
 
     // Reset form
@@ -511,6 +741,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     renderItems();
     updateProgress();
+    updateStats();
     saveItems();
   }
 
@@ -519,6 +750,7 @@ document.addEventListener("DOMContentLoaded", function () {
     items = items.filter((item) => item.id !== id);
     renderItems();
     updateProgress();
+    updateStats();
     saveItems();
   }
 
@@ -537,6 +769,37 @@ document.addEventListener("DOMContentLoaded", function () {
     progressFill.style.width = `${progress}%`;
     progressPercent.textContent = `${roundedProgress}%`;
   }
+
+function updateStats() {
+  const totalItemsCount = items.length;
+  const completed = items.filter((item) => item.completed);
+  const completedItemsCount = completed.length;
+  const inProgress = items.filter((item) => !item.completed);
+  const inProgressItemsCount = inProgress.length;
+
+  totalItems.textContent = totalItemsCount;
+  completedItems.textContent = completedItemsCount;
+  inProgressItems.textContent = inProgressItemsCount;
+
+  // Helper function to limit icons and show "+N"
+  const renderIcons = (list) => {
+    if (totalItemsCount === 0) return "";
+    const icons = list.map((item) =>
+      iconForLanguage(item.language, item.customName)
+    );
+    if (icons.length <= 5) return icons.join("");
+    const visible = icons.slice(0, 4).join("");
+    const remaining = icons.length - 4;
+    return (
+      visible +
+      `<span class="more-icons">+${remaining}</span>`
+    );
+  };
+
+  completedStat.querySelector(".icons").innerHTML = renderIcons(completed);
+  inProgressStat.querySelector(".icons").innerHTML = renderIcons(inProgress);
+}
+
 
   // Modal helpers
   function openModal() {
@@ -620,7 +883,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     if (languageIcon) {
-      languageIcon.innerHTML = languageIcons[value] || languageIcons.custom;
+      languageIcon.innerHTML = iconForLanguage(value);
     }
   }
 
