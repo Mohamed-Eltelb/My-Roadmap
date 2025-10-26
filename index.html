@@ -28,14 +28,14 @@
                     </svg>
                     Add your first item
                 </button>
-                <button href="#roadmapItems" class="btn btn-outline btn-lg">
+                <a href="#roadmapItems" class="btn btn-outline btn-lg">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                         <path fill="currentColor" fill-rule="evenodd"
                             d="M2 12c0 5.523 4.477 10 10 10s10-4.477 10-10S17.523 2 12 2S2 6.477 2 12m13.53.47a.75.75 0 0 1 0 1.06l-3 3a.75.75 0 0 1-1.06 0l-3-3a.75.75 0 1 1 1.06-1.06l1.72 1.72V8a.75.75 0 0 1 1.5 0v6.19l1.72-1.72a.75.75 0 0 1 1.06 0"
                             clip-rule="evenodd" />
                     </svg>
                     Jump to roadmap
-                </button>
+                </a>
             </div>
             <div class="floating-icons" aria-hidden="true">
                 <span class="bubble" style=""><i class="fab fa-html5" style="color:#e34f26"></i></span>
@@ -45,7 +45,38 @@
             </div>
             <div class="header-actions"></div>
         </header>
-
+        <div class="progress-container">
+            <div class="progress-text">
+                <span>Your Progress</span>
+                <span id="progressPercent">0%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+            <div class="stats" id="statsContainer">
+                <div class="stat" id="totalStat">
+                    <span class="stat-value" id="totalItems">0</span>
+                    <span class="stat-label">Total Items</span>
+                </div>
+                <div class="stat" id="completedStat">
+                    <span class="stat-value" id="completedItems"></span>
+                    <span class="stat-label">Completed</span>
+                    <div class="icons">
+                    </div>
+                </div>
+                <div class="stat" id="inProgressStat">
+                    <span class="stat-value" id="inProgressItems"></span>
+                    <span class="stat-label">In Progress</span>
+                    <div class="icons">
+                    </div>
+                </div>
+            </div>
+            <button class="expand-btn" id="expandBtn"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path fill="currentColor" fill-rule="evenodd"
+                        d="M4.43 8.512a.75.75 0 0 1 1.058-.081L12 14.012l6.512-5.581a.75.75 0 0 1 .976 1.138l-7 6a.75.75 0 0 1-.976 0l-7-6a.75.75 0 0 1-.081-1.057"
+                        clip-rule="evenodd" />
+                </svg></button>
+        </div>
         <div class="main-content">
             <div class="roadmap-container">
                 <div class="roadmap-header">
@@ -82,33 +113,7 @@
                     </div>
                 </div>
 
-                <div class="progress-container">
-                    <div class="progress-text">
-                        <span>Your Progress</span>
-                        <span id="progressPercent">0%</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
-                    </div>
-                    <div class="stats" id="statsContainer">
-                        <div class="stat" id="totalStat">
-                            <span class="stat-value" id="totalItems">0</span>
-                            <span class="stat-label">Items</span>
-                        </div>
-                        <div class="stat" id="completedStat">
-                            <span class="stat-value" id="completedItems"></span>
-                            <span class="stat-label">Completed</span>
-                            <div class="icons">
-                            </div>
-                        </div>
-                        <div class="stat" id="inProgressStat">
-                            <span class="stat-value" id="inProgressItems"></span>
-                            <span class="stat-label">In Progress</span>
-                            <div class="icons">
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
 
                 <div class="roadmap-items" id="roadmapItems">
                     <!-- Roadmap items will be added here dynamically -->

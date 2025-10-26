@@ -273,10 +273,17 @@ document.addEventListener("DOMContentLoaded", function () {
       defaultEmptyHTML = emptyState.innerHTML;
     // Load items (from storage or defaults)
     items = loadItems();
+    
     renderItems();
     updateProgress();
     updateStats();
     if (roadmapItems) roadmapItems.setAttribute("role", "list");
+    const savedView = localStorage.getItem("viewMode") || "list";
+    if (savedView === "grid") {
+      roadmapItems.classList.add("grid-view");
+    } else {
+      roadmapItems.classList.remove("grid-view");
+    }
 
     // Open modal when Add Item button is clicked
     if (addItemBtn && addItemModal) {
@@ -333,6 +340,9 @@ document.addEventListener("DOMContentLoaded", function () {
         renderItems();
       });
     }
+    document.getElementById('expandBtn').addEventListener('click', function() {
+        this.parentElement.classList.toggle('expanded');
+    });
   }
 
   // THEME: setup and toggle
@@ -403,6 +413,8 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!roadmapItems) return;
     let isGridView = roadmapItems.classList.contains("grid-view");
     roadmapItems.classList.toggle("grid-view");
+    localStorage.setItem("viewMode", isGridView ? "list" : "grid");
+    // Update button icon
     changeViewBtn.innerHTML = isGridView
       ? `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
           <path fill="currentColor"
@@ -770,36 +782,32 @@ document.addEventListener("DOMContentLoaded", function () {
     progressPercent.textContent = `${roundedProgress}%`;
   }
 
-function updateStats() {
-  const totalItemsCount = items.length;
-  const completed = items.filter((item) => item.completed);
-  const completedItemsCount = completed.length;
-  const inProgress = items.filter((item) => !item.completed);
-  const inProgressItemsCount = inProgress.length;
+  function updateStats() {
+    const totalItemsCount = items.length;
+    const completed = items.filter((item) => item.completed);
+    const completedItemsCount = completed.length;
+    const inProgress = items.filter((item) => !item.completed);
+    const inProgressItemsCount = inProgress.length;
 
-  totalItems.textContent = totalItemsCount;
-  completedItems.textContent = completedItemsCount;
-  inProgressItems.textContent = inProgressItemsCount;
+    totalItems.textContent = totalItemsCount;
+    completedItems.textContent = completedItemsCount;
+    inProgressItems.textContent = inProgressItemsCount;
 
-  // Helper function to limit icons and show "+N"
-  const renderIcons = (list) => {
-    if (totalItemsCount === 0) return "";
-    const icons = list.map((item) =>
-      iconForLanguage(item.language, item.customName)
-    );
-    if (icons.length <= 5) return icons.join("");
-    const visible = icons.slice(0, 4).join("");
-    const remaining = icons.length - 4;
-    return (
-      visible +
-      `<span class="more-icons">+${remaining}</span>`
-    );
-  };
+    // Helper function to limit icons and show "+N"
+    const renderIcons = (list) => {
+      if (totalItemsCount === 0) return "";
+      const icons = list.map((item) =>
+        iconForLanguage(item.language, item.customName)
+      );
+      if (icons.length <= 5) return icons.join("");
+      const visible = icons.slice(0, 4).join("");
+      const remaining = icons.length - 4;
+      return visible + `<span class="more-icons">+${remaining}</span>`;
+    };
 
-  completedStat.querySelector(".icons").innerHTML = renderIcons(completed);
-  inProgressStat.querySelector(".icons").innerHTML = renderIcons(inProgress);
-}
-
+    completedStat.querySelector(".icons").innerHTML = renderIcons(completed);
+    inProgressStat.querySelector(".icons").innerHTML = renderIcons(inProgress);
+  }
 
   // Modal helpers
   function openModal() {
@@ -934,16 +942,7 @@ function updateStats() {
       }
     } catch (_) {}
     // default seed
-    return [
-      { id: 1, title: "Learn HTML", language: "html", completed: true },
-      { id: 2, title: "Learn CSS", language: "css", completed: true },
-      {
-        id: 3,
-        title: "Learn JavaScript",
-        language: "javascript",
-        completed: false,
-      },
-    ];
+    return [];
   }
 
   function saveItems() {

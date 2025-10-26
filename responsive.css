@@ -8,6 +8,9 @@
   .roadmap-header {
     flex-direction: column;
     gap: 10px;
+    position: sticky;
+    top: 10px;
+    z-index: 10;
   }
   .roadmap-item {
     flex-direction: column;
