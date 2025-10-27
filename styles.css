@@ -355,7 +355,9 @@ h1 {
   /* background: var(--bg-card); */
   background: none;
   border: none;
-  border-radius: 12px;
+  border-radius: 0;
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
   outline: none;
   color: var(--text-primary);
 }
@@ -383,8 +385,6 @@ h1 {
   backdrop-filter: blur(16px) saturate(160%);
   -webkit-backdrop-filter: blur(16px) saturate(160%);
   box-shadow: var(--shadow);
-  /* position: sticky;
-  top: 10px; */
   transition: height 0.4s ease;
   z-index: 99;
 }
