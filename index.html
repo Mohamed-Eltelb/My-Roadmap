@@ -86,7 +86,7 @@
                         <input type="text" id="searchInput" placeholder="Search items..." aria-label="Search items">
                     </div>
                     <div class="header-tools">
-                        <button type="button" id="themeToggle" class="theme-toggle" aria-label="Toggle dark mode"
+                        <button type="button" id="themeToggle" class="toggle" aria-label="Toggle dark mode"
                             aria-pressed="false" title="Toggle dark mode">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                                 <path fill="currentColor"
@@ -95,7 +95,7 @@
                                     d="M12 22c5.523 0 10-4.477 10-10c0-.463-.694-.54-.933-.143a6.5 6.5 0 1 1-8.924-8.924C12.54 2.693 12.463 2 12 2C6.477 2 2 6.477 2 12s4.477 10 10 10" />
                             </svg>
                         </button>
-                        <button class="btn btn-primary not-active" id="swapModeBtn" title="Swap Mode"
+                        <button class="toggle" id="swapModeBtn" title="Swap Mode"
                             style="border: 1px solid transparent;">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                                 <path fill="currentColor" fill-rule="evenodd"
@@ -187,6 +187,7 @@
                         </div>
 
                         <div class="form-group form-submit">
+                            <p class="error-log" id="errorLog"></p>
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-plus"></i> Add to Roadmap
                             </button>
