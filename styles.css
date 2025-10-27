@@ -508,6 +508,13 @@ h1 {
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.22);
 } */
 
+.not-active {
+  background: var(--bg-card) !important;
+  box-shadow: var(--glass-shadow) !important;
+  border: 1px solid var(--glass-border) !important;
+  
+}
+
 .roadmap-item:active {
   cursor: grabbing;
 }
@@ -857,6 +864,12 @@ select:focus {
 }
 .language-suggestions .suggestion:hover {
   background-color: var(--muted-surface);
+}
+
+.no-suggestions,
+.loading {
+  padding: 10px 12px;
+  color: var(--text-secondary);
 }
 
 .suggestion i {
