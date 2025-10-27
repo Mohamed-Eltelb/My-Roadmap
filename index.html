@@ -81,7 +81,10 @@
         <div class="main-content">
             <div class="roadmap-container">
                 <div class="roadmap-header">
-                    <h2 class="roadmap-title">My Learning Path</h2>
+                    <div class="search" role="search">
+                        <i class="fas fa-search" aria-hidden="true"></i>
+                        <input type="text" id="searchInput" placeholder="Search items..." aria-label="Search items">
+                    </div>
                     <div class="header-tools">
                         <button type="button" id="themeToggle" class="theme-toggle" aria-label="Toggle dark mode"
                             aria-pressed="false" title="Toggle dark mode">
@@ -141,10 +144,7 @@
                                     clip-rule="evenodd" />
                             </svg>
                         </button>
-                        <div class="search" role="search" style="display: none;">
-                            <i class="fas fa-search" aria-hidden="true"></i>
-                            <input type="text" id="searchInput" placeholder="Search items..." aria-label="Search items">
-                        </div>
+
                     </div>
                 </div>
 
