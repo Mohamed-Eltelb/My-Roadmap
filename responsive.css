@@ -41,6 +41,13 @@
     height: 28px;
     font-size: 15px;
   }
+  .hero-header {
+    padding-top: 60px;
+    padding-bottom: 40px;
+  }
+  .hero-actions {
+    gap: 8px;
+  }
 }
 
 @media (min-width: 768px) {
@@ -53,17 +60,6 @@
     backdrop-filter: blur(18px) saturate(160%);
     -webkit-backdrop-filter: blur(18px) saturate(160%);
     user-select: none;
-  }
-}
-
-/* Responsive tweaks for hero */
-@media (max-width: 768px) {
-  .hero-header {
-    padding-top: 60px;
-    padding-bottom: 40px;
-  }
-  .hero-actions {
-    gap: 8px;
   }
 }
 

@@ -1,3 +1,5 @@
+import { languageIcons } from "./languageIcons.js";
+
 document.addEventListener("DOMContentLoaded", function () {
   // DOM Elements
   const roadmapItems = document.getElementById("roadmapItems");
@@ -13,12 +15,13 @@ document.addEventListener("DOMContentLoaded", function () {
   const addItemModal = document.getElementById("addItemModal");
   const closeModalBtn = document.getElementById("closeModalBtn");
   const languageIcon = document.querySelector(".language-icon");
-  const customLanguageGroup = document.getElementById("customLanguageGroup");
-  const customLanguageName = document.getElementById("customLanguageName");
   const searchInput = document.getElementById("searchInput");
   const changeViewBtn = document.getElementById("changeViewBtn");
-  const statsContainer = document.getElementById("statsContainer");
-  const totalStat = document.getElementById("totalStat");
+  const exportRoadmapBtn = document.getElementById("exportRoadmapBtn");
+  const exportFormattedRoadmapBtn = document.getElementById(
+    "exportFormattedRoadmapBtn"
+  );
+  const swapModeBtn = document.getElementById("swapModeBtn");
   const completedStat = document.getElementById("completedStat");
   const inProgressStat = document.getElementById("inProgressStat");
   const totalItems = document.getElementById("totalItems");
@@ -28,165 +31,13 @@ document.addEventListener("DOMContentLoaded", function () {
   let searchQuery = "";
   let defaultEmptyHTML = null;
   let editingItemId = null;
+  let swapOnDrop = true;
 
   // Data
   const STORAGE_KEY = "my-roadmap-items";
   let items = [];
 
   // Language icons mapping
-  const languageIcons = {
-    // Core web
-    html: '<i class="fab fa-html5" style="color: #e34f26;"></i>',
-    css: '<i class="fab fa-css3-alt" style="color: #1572b6;"></i>',
-    javascript: '<i class="fab fa-js-square" style="color: #f7df1e;"></i>',
-    js: '<i class="fab fa-js-square" style="color: #f7df1e;"></i>',
-    typescript: '<i class="fas fa-code" style="color: #3178c6;"></i>',
-    ts: '<i class="fas fa-code" style="color: #3178c6;"></i>',
-
-    // Front-end frameworks & libs
-    react: '<i class="fab fa-react" style="color: #61dafb;"></i>',
-    "react-native": '<i class="fab fa-react" style="color: #61dafb;"></i>',
-    nextjs: '<i class="fas fa-arrow-right" style="color: #000000;"></i>',
-    remix: '<i class="fas fa-route" style="color: #2e2e2e;"></i>',
-    astro: '<i class="fas fa-star" style="color: #ff5d01;"></i>',
-    vue: '<i class="fab fa-vuejs" style="color: #42b883;"></i>',
-    nuxtjs: '<i class="fas fa-mountain" style="color: #00dc82;"></i>',
-    angular: '<i class="fab fa-angular" style="color: #dd0031;"></i>',
-    svelte: '<i class="fab fa-svelte" style="color: #ff3e00;"></i>',
-    solidjs: '<i class="fas fa-gem" style="color: #2c4f7c;"></i>',
-    jquery: '<i class="fas fa-code" style="color: #0769ad;"></i>',
-    bootstrap: '<i class="fab fa-bootstrap" style="color: #7952b3;"></i>',
-    tailwind: '<i class="fas fa-wind" style="color: #38b2ac;"></i>',
-    sass: '<i class="fab fa-sass" style="color: #cc6699;"></i>',
-    less: '<i class="fas fa-less-than" style="color: #2b4c80;"></i>',
-    postcss: '<i class="fas fa-magic" style="color: #dd3a0a;"></i>',
-    materialui: '<i class="fas fa-layer-group" style="color: #007fff;"></i>',
-    chakraui: '<i class="fas fa-shapes" style="color: #319795;"></i>',
-    "ant-design": '<i class="fas fa-border-all" style="color: #1677ff;"></i>',
-    radix: '<i class="fas fa-cubes" style="color: #111827;"></i>',
-
-    // Runtime & tooling
-    node: '<i class="fab fa-node-js" style="color: #339933;"></i>',
-    nodejs: '<i class="fab fa-node-js" style="color: #339933;"></i>',
-    deno: '<i class="fas fa-terminal" style="color: #000000;"></i>',
-    bun: '<i class="fas fa-bolt" style="color: #fbf0df;"></i>',
-    vite: '<i class="fas fa-bolt" style="color: #646cff;"></i>',
-    webpack: '<i class="fab fa-webpack" style="color: #8dd6f9;"></i>',
-    rollup: '<i class="fas fa-circle-notch" style="color: #ef3335;"></i>',
-    parcel: '<i class="fas fa-box-open" style="color: #f2994a;"></i>',
-    babel: '<i class="fas fa-bolt" style="color: #f9dc3e;"></i>',
-    eslint: '<i class="fas fa-check-double" style="color: #4b32c3;"></i>',
-    prettier: '<i class="fas fa-paint-brush" style="color: #f7b93e;"></i>',
-    npm: '<i class="fab fa-npm" style="color: #cb3837;"></i>',
-    yarn: '<i class="fab fa-yarn" style="color: #2c8ebb;"></i>',
-    pnpm: '<i class="fas fa-boxes" style="color: #f69220;"></i>',
-
-    // Back-end languages & frameworks
-    python: '<i class="fab fa-python" style="color: #3776ab;"></i>',
-    django: '<i class="fas fa-leaf" style="color: #092e20;"></i>',
-    flask: '<i class="fas fa-flask" style="color: #000000;"></i>',
-    fastapi: '<i class="fas fa-rocket" style="color: #009688;"></i>',
-    java: '<i class="fab fa-java" style="color: #007396;"></i>',
-    spring: '<i class="fas fa-leaf" style="color: #6db33f;"></i>',
-    kotlin: '<i class="fas fa-code" style="color: #0095d5;"></i>',
-    scala: '<i class="fas fa-code" style="color: #dc322f;"></i>',
-    go: '<i class="fas fa-code" style="color: #00add8;"></i>',
-    rust: '<i class="fas fa-gears" style="color: #dea584;"></i>',
-    php: '<i class="fab fa-php" style="color: #777bb4;"></i>',
-    laravel: '<i class="fab fa-laravel" style="color: #ff2d20;"></i>',
-    symfony: '<i class="fab fa-symfony" style="color: #000000;"></i>',
-    ruby: '<i class="fas fa-gem" style="color: #cc342d;"></i>',
-    rails: '<i class="fas fa-gem" style="color: #cc0000;"></i>',
-    c: '<i class="fas fa-code" style="color: #a8b9cc;"></i>',
-    "c++": '<i class="fas fa-code" style="color: #00599c;"></i>',
-    "c#": '<i class="fas fa-code" style="color: #239120;"></i>',
-    ".net": '<i class="fab fa-microsoft" style="color: #512bd4;"></i>',
-    aspnet: '<i class="fab fa-microsoft" style="color: #5c2d91;"></i>',
-    fsharp: '<i class="fas fa-code" style="color: #378bba;"></i>',
-    elixir: '<i class="fas fa-droplet" style="color: #4b275f;"></i>',
-    phoenix: '<i class="fas fa-feather" style="color: #f25d0e;"></i>',
-    erlang: '<i class="fas fa-code" style="color: #a90533;"></i>',
-
-    // Mobile & desktop
-    android: '<i class="fab fa-android" style="color: #3ddc84;"></i>',
-    ios: '<i class="fab fa-apple" style="color: #000000;"></i>',
-    swift: '<i class="fas fa-code" style="color: #f05138;"></i>',
-    "objective-c": '<i class="fas fa-code" style="color: #438eff;"></i>',
-    flutter: '<i class="fas fa-mobile-alt" style="color: #02569b;"></i>',
-    ionic: '<i class="fas fa-circle" style="color: #3880ff;"></i>',
-    capacitor: '<i class="fas fa-bolt" style="color: #2e2e2e;"></i>',
-    electron: '<i class="fas fa-atom" style="color: #47848f;"></i>',
-    tauri: '<i class="fas fa-desktop" style="color: #24c8db;"></i>',
-
-    // Data & databases
-    mysql: '<i class="fas fa-database" style="color: #4479a1;"></i>',
-    mariadb: '<i class="fas fa-database" style="color: #1f305f;"></i>',
-    postgresql: '<i class="fas fa-database" style="color: #336791;"></i>',
-    sqlite: '<i class="fas fa-database" style="color: #003b57;"></i>',
-    mongodb: '<i class="fas fa-leaf" style="color: #47a248;"></i>',
-    redis: '<i class="fas fa-database" style="color: #dc382d;"></i>',
-    firebase: '<i class="fas fa-fire" style="color: #ffca28;"></i>',
-    supabase: '<i class="fas fa-leaf" style="color: #3ecf8e;"></i>',
-    graphql: '<i class="fas fa-project-diagram" style="color: #e10098;"></i>',
-    prisma: '<i class="fas fa-cube" style="color: #0c344b;"></i>',
-    sequelize: '<i class="fas fa-database" style="color: #52b0e7;"></i>',
-    typeorm: '<i class="fas fa-database" style="color: #e34f26;"></i>',
-    mongoose: '<i class="fas fa-leaf" style="color: #47a248;"></i>',
-
-    // DevOps & cloud
-    aws: '<i class="fab fa-aws" style="color: #ff9900;"></i>',
-    azure: '<i class="fab fa-microsoft" style="color: #0078d4;"></i>',
-    gcp: '<i class="fab fa-google" style="color: #4285f4;"></i>',
-    vercel: '<i class="fas fa-play" style="color: #000000;"></i>',
-    netlify: '<i class="fas fa-cloud" style="color: #00ad9f;"></i>',
-    docker: '<i class="fab fa-docker" style="color: #2496ed;"></i>',
-    kubernetes: '<i class="fas fa-dharmachakra" style="color: #326ce5;"></i>',
-    nginx: '<i class="fas fa-server" style="color: #269539;"></i>',
-    apache: '<i class="fas fa-feather" style="color: #d22128;"></i>',
-    terraform: '<i class="fas fa-cubes" style="color: #7b42bc;"></i>',
-
-    // VCS & platforms
-    git: '<i class="fab fa-git-alt" style="color: #f05032;"></i>',
-    github: '<i class="fab fa-github" style="color: #000000;"></i>',
-    gitlab: '<i class="fab fa-gitlab" style="color: #fc6d26;"></i>',
-    bitbucket: '<i class="fab fa-bitbucket" style="color: #205081;"></i>',
-    jenkins: '<i class="fab fa-jenkins" style="color: #d33833;"></i>',
-    travis: '<i class="fas fa-traffic-light" style="color: #3eaaaf;"></i>',
-    circleci: '<i class="fas fa-circle" style="color: #343434;"></i>',
-
-    // Testing
-    jest: '<i class="fas fa-vial" style="color: #c21325;"></i>',
-    mocha: '<i class="fas fa-mug-hot" style="color: #8d6748;"></i>',
-    chai: '<i class="fas fa-mug-hot" style="color: #a30701;"></i>',
-    cypress: '<i class="fas fa-dot-circle" style="color: #2f2e2e;"></i>',
-    playwright: '<i class="fas fa-theater-masks" style="color: #2f2e2e;"></i>',
-
-    // Data science & ML
-    numpy: '<i class="fas fa-superscript" style="color: #013243;"></i>',
-    pandas: '<i class="fas fa-table" style="color: #150458;"></i>',
-    matplotlib: '<i class="fas fa-chart-line" style="color: #11557c;"></i>',
-    jupyter: '<i class="fas fa-book" style="color: #f37726;"></i>',
-    tensorflow: '<i class="fas fa-brain" style="color: #ff6f00;"></i>',
-    pytorch: '<i class="fas fa-fire" style="color: #ee4c2c;"></i>',
-
-    // Visualization & misc
-    threejs: '<i class="fas fa-cubes" style="color: #000000;"></i>',
-    d3js: '<i class="fas fa-chart-bar" style="color: #f37a20;"></i>',
-    electronjs: '<i class="fas fa-atom" style="color: #47848f;"></i>',
-    wasm: '<i class="fas fa-microchip" style="color: #654ff0;"></i>',
-    graphqlapollo: '<i class="fas fa-atom" style="color: #311c87;"></i>',
-
-    // CMS & platforms
-    wordpress: '<i class="fab fa-wordpress" style="color: #21759b;"></i>',
-    drupal: '<i class="fab fa-drupal" style="color: #0678be;"></i>',
-    joomla: '<i class="fab fa-joomla" style="color: #5091cd;"></i>',
-    magento: '<i class="fab fa-magento" style="color: #ec672c;"></i>',
-    shopify: '<i class="fab fa-shopify" style="color: #95bf47;"></i>',
-
-    // Generic fallback
-    custom: '<i class="fas fa-code" style="color: #a1a1aa;"></i>',
-  };
-
   const aliasMap = {
     "react.js": "react",
     reactjs: "react",
@@ -229,6 +80,28 @@ document.addEventListener("DOMContentLoaded", function () {
     return languageIcons.custom;
   }
 
+  document.addEventListener("keydown", (e) => {
+    // Alt+N pressed
+    if (e.altKey && !e.ctrlKey && !e.metaKey && e.key.toLowerCase() === "n") {
+      // don't hijack while user types in text fields
+      const active = document.activeElement;
+      const typingTags = ["INPUT", "TEXTAREA"];
+      if (
+        active &&
+        (typingTags.includes(active.tagName) || active.isContentEditable)
+      )
+        return;
+
+      e.preventDefault();
+      const btn = document.getElementById("addItemBtn");
+      if (!btn) return;
+
+      if (!btn.hasAttribute("tabindex")) btn.setAttribute("tabindex", "0");
+      // btn.focus();
+      btn.click();
+    }
+  });
+
   if (languageSelect)
     languageSelect.addEventListener("input", function () {
       const val = this.value;
@@ -265,6 +138,40 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
 
+  if (exportRoadmapBtn)
+    exportRoadmapBtn.addEventListener("click", () => {
+      const filteredItems = items.map(({ id, ...rest }) => rest);
+
+      const dataStr = JSON.stringify(filteredItems, null, 2); // formatted JSON
+      const blob = new Blob([dataStr], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      downloadFile(url);
+    });
+
+  exportFormattedRoadmapBtn.addEventListener("click", () => {
+    // Convert each item into readable text
+    const formatted = items
+      .map(
+        (item) =>
+          `Name: ${item.title}\nLanguage: ${item.language}\nStatus: ${
+            item.completed ? "Completed" : "In Progress"
+          }`
+      )
+      .join("\n\n");
+
+    const blob = new Blob([formatted], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    downloadFile(url);
+  });
+
+  function downloadFile(url) {
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "Roadmap.txt";
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   // Initialize the app
   function init() {
     setupTheme();
@@ -273,7 +180,7 @@ document.addEventListener("DOMContentLoaded", function () {
       defaultEmptyHTML = emptyState.innerHTML;
     // Load items (from storage or defaults)
     items = loadItems();
-    
+
     renderItems();
     updateProgress();
     updateStats();
@@ -340,8 +247,8 @@ document.addEventListener("DOMContentLoaded", function () {
         renderItems();
       });
     }
-    document.getElementById('expandBtn').addEventListener('click', function() {
-        this.parentElement.classList.toggle('expanded');
+    document.getElementById("expandBtn").addEventListener("click", function () {
+      this.parentElement.classList.toggle("expanded");
     });
   }
 
@@ -429,6 +336,14 @@ document.addEventListener("DOMContentLoaded", function () {
       </svg>`;
   }
 
+  swapModeBtn.addEventListener("click", () => {
+    swapOnDrop = !swapOnDrop;
+    swapModeBtn.setAttribute("title", swapOnDrop ? "Swap on drop" : "Move on drop");
+    swapModeBtn.innerHTML = swapOnDrop
+      ? '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="m20.312 12.647l.517-1.932c.604-2.255.907-3.382.68-4.358a4 4 0 0 0-1.162-2.011c-.731-.685-1.859-.987-4.114-1.591c-2.255-.605-3.383-.907-4.358-.68a4 4 0 0 0-2.011 1.162c-.587.626-.893 1.543-1.348 3.209l-.244.905l-.517 1.932c-.605 2.255-.907 3.382-.68 4.358a4 4 0 0 0 1.162 2.011c.731.685 1.859.987 4.114 1.592c2.032.544 3.149.843 4.064.73q.15-.019.294-.052a4 4 0 0 0 2.011-1.16c.685-.732.987-1.86 1.592-4.115"/><path fill="currentColor" d="M16.415 17.975a4 4 0 0 1-1.068 1.677c-.731.685-1.859.987-4.114 1.591s-3.383.907-4.358.679a4 4 0 0 1-2.011-1.161c-.685-.731-.988-1.859-1.592-4.114l-.517-1.932c-.605-2.255-.907-3.383-.68-4.358a4 4 0 0 1 1.162-2.011c.731-.685 1.859-.987 4.114-1.592q.638-.172 1.165-.309l-.244.906l-.517 1.932c-.605 2.255-.907 3.382-.68 4.358a4 4 0 0 0 1.162 2.011c.731.685 1.859.987 4.114 1.592c2.032.544 3.149.843 4.064.73" opacity="0.5"/></svg>'
+      : '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M8 5.5h8a3 3 0 0 0 3-3a.5.5 0 0 0-.5-.5h-13a.5.5 0 0 0-.5.5a3 3 0 0 0 3 3m-3 6c0-1.886 0-2.828.586-3.414S7.114 7.5 9 7.5h6c1.886 0 2.828 0 3.414.586S19 9.614 19 11.5v1c0 1.886 0 2.828-.586 3.414S16.886 16.5 15 16.5H9c-1.886 0-2.828 0-3.414-.586S5 14.386 5 12.5zm11 7H8a3 3 0 0 0-3 3a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5a3 3 0 0 0-3-3"/></svg>';
+  });
+
   // Render all roadmap items (respects search filter)
   function renderItems() {
     const list = getFilteredItems();
@@ -468,9 +383,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function getFilteredItems() {
     if (!searchQuery) return items.slice();
     return items.filter((it) => {
-      const hay = `${it.title} ${it.customName || ""} ${
-        it.language
-      }`.toLowerCase();
+      const hay = `${it.title} ${it.language}`.toLowerCase();
       return hay.includes(searchQuery);
     });
   }
@@ -493,8 +406,14 @@ document.addEventListener("DOMContentLoaded", function () {
                             <div class="item-title">${item.title}</div>
                             <div class="item-status">${
                               (item.completed ? "Completed" : "In Progress") +
-                              (item.language === "custom" && item.customName
-                                ? ` • ${item.customName}`
+                              (item.completedAt
+                                ? ` • ${new Date(
+                                    item.completedAt
+                                  ).toLocaleDateString("en-GB", {
+                                    day: "2-digit",
+                                    month: "short",
+                                    year: "numeric",
+                                  })}`
                                 : "")
                             }</div>
                         </div>
@@ -621,13 +540,13 @@ document.addEventListener("DOMContentLoaded", function () {
     itemDiv.addEventListener("dragenter", (e) => {
       if (Number(itemDiv.dataset.id) === draggingId) return;
       dragEnterCounter++;
-      itemDiv.classList.add("drag-over");
+      itemDiv.classList.add(swapOnDrop ? "drag-over-swap" : "drag-over");
     });
 
     itemDiv.addEventListener("dragleave", () => {
       dragEnterCounter--;
       if (dragEnterCounter === 0) {
-        itemDiv.classList.remove("drag-over");
+        itemDiv.classList.remove(swapOnDrop ? "drag-over-swap" : "drag-over");
       }
     });
 
@@ -639,7 +558,7 @@ document.addEventListener("DOMContentLoaded", function () {
     itemDiv.addEventListener("drop", (e) => {
       e.preventDefault();
       dragEnterCounter = 0;
-      itemDiv.classList.remove("drag-over");
+      itemDiv.classList.remove(swapOnDrop ? "drag-over-swap" : "drag-over");
 
       const srcIdStr =
         (e.dataTransfer && e.dataTransfer.getData("text/plain")) ||
@@ -656,8 +575,10 @@ document.addEventListener("DOMContentLoaded", function () {
       draggingId = null;
       dragEnterCounter = 0;
       document
-        .querySelectorAll(".roadmap-item.drag-over")
-        .forEach((el) => el.classList.remove("drag-over"));
+        .querySelectorAll(
+          ".roadmap-item.drag-over, .roadmap-item.drag-over-swap"
+        )
+        .forEach((el) => el.classList.remove("drag-over", "drag-over-swap"));
     });
 
     return itemDiv;
@@ -667,8 +588,15 @@ document.addEventListener("DOMContentLoaded", function () {
     const srcIndex = items.findIndex((it) => it.id === srcId);
     const targetIndex = items.findIndex((it) => it.id === targetId);
     if (srcIndex < 0 || targetIndex < 0) return;
-    const [moved] = items.splice(srcIndex, 1);
-    items.splice(targetIndex, 0, moved);
+    if (swapOnDrop) {
+      // Swap the two items
+      const temp = items[srcIndex];
+      items[srcIndex] = items[targetIndex];
+      items[targetIndex] = temp;
+    } else {
+      const [moved] = items.splice(srcIndex, 1);
+      items.splice(targetIndex, 0, moved);
+    }
     renderItems();
     updateProgress();
     updateStats();
@@ -691,21 +619,21 @@ document.addEventListener("DOMContentLoaded", function () {
   function addNewItem() {
     let title = document.getElementById("itemTitle").value;
     const language = languageSelect.value;
-    const customName = customLanguageName ? customLanguageName.value : "";
+    if (!language.trim()) return;
     title =
       title.trim() !== ""
         ? title.trim()
-        : `Learn ${toUpperCaseFirstLetter(customName || language)}`;
-
-    // if (!title.trim()) return;
-    if (language === "custom" && !customName.trim()) {
-      // Show field if hidden and focus
-      if (customLanguageGroup) customLanguageGroup.classList.remove("hidden");
-      if (customLanguageName) customLanguageName.focus();
-      return;
-    }
+        : `Learn ${toUpperCaseFirstLetter(language)}`;
 
     if (editingItemId) {
+      const itemLang = items.find((it) => it.id === editingItemId)?.language;
+      if (itemLang !== language) {
+        const exists = items.some((it) => it.language === language);
+        if (exists) {
+          console.log(`Item with language "${language}" already exists.`);
+          return;
+        }
+      }
       // Update existing item
       items = items.map((it) =>
         it.id === editingItemId
@@ -713,17 +641,22 @@ document.addEventListener("DOMContentLoaded", function () {
               ...it,
               title: title,
               language: language,
-              customName: language === "custom" ? customName.trim() : undefined,
             }
           : it
       );
     } else {
+      const exists = items.some((it) => it.language === language);
+      if (exists) {
+        console.log(`Item with language "${language}" already exists.`);
+        return;
+      }
       const newItem = {
         id: Date.now(), // Simple ID generation
         title: title,
         language: language,
-        customName: language === "custom" ? customName.trim() : undefined,
         completed: false,
+        createdAt: Date.now(),
+        completedAt: null,
       };
       items.push(newItem);
     }
@@ -734,9 +667,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Reset form
     itemForm.reset();
-    // Reset custom language UI
-    if (customLanguageGroup) customLanguageGroup.classList.add("hidden");
-    if (customLanguageName) customLanguageName.removeAttribute("required");
+
     handleLanguageChange(languageSelect.value);
     // Close modal and reset editing state
     closeModal();
@@ -746,7 +677,11 @@ document.addEventListener("DOMContentLoaded", function () {
   function toggleItemCompletion(id) {
     items = items.map((item) => {
       if (item.id === id) {
-        return { ...item, completed: !item.completed };
+        return {
+          ...item,
+          completed: !item.completed,
+          completedAt: !item.completed ? Date.now() : null,
+        };
       }
       return item;
     });
@@ -796,9 +731,14 @@ document.addEventListener("DOMContentLoaded", function () {
     // Helper function to limit icons and show "+N"
     const renderIcons = (list) => {
       if (totalItemsCount === 0) return "";
-      const icons = list.map((item) =>
-        iconForLanguage(item.language, item.customName)
-      );
+      const icons = list.map((item) => {
+        const icon = iconForLanguage(item.language);
+        if (typeof icon === "string" && icon.includes("<svg")) {
+          return `<div class="icon-wrapper">${icon}</div>`;
+        }
+        return icon;
+      });
+
       if (icons.length <= 5) return icons.join("");
       const visible = icons.slice(0, 4).join("");
       const remaining = icons.length - 4;
@@ -846,9 +786,6 @@ document.addEventListener("DOMContentLoaded", function () {
       languageSelect.value = item.language;
       handleLanguageChange(item.language);
     }
-    if (customLanguageName) {
-      customLanguageName.value = item.customName || "";
-    }
     // labels
     const titleEl = document.getElementById("addItemTitle");
     if (titleEl) titleEl.textContent = "Edit Item";
@@ -881,15 +818,6 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function handleLanguageChange(value) {
-    const isCustom = value === "custom";
-    if (customLanguageGroup) {
-      customLanguageGroup.classList.toggle("hidden", !isCustom);
-    }
-    if (customLanguageName) {
-      if (isCustom) customLanguageName.setAttribute("required", "true");
-      else customLanguageName.removeAttribute("required");
-    }
-
     if (languageIcon) {
       languageIcon.innerHTML = iconForLanguage(value);
     }
