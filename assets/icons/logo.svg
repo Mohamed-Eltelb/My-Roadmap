@@ -1,0 +1,34 @@
+<svg role="img" aria-labelledby="title" viewBox="9.3184 9.807539199999999 45.44 44.928" xmlns="http://www.w3.org/2000/svg" width="1024" height="1024">
+  <title>My Roadmap</title>
+  <defs>
+    <linearGradient y2="100%" x2="100%" y1="0%" x1="0%" id="g1">
+      <stop stop-color="#7c3aed" offset="0%" data-darkreader-inline-stopcolor="" style="--darkreader-inline-stopcolor: var(--darkreader-background-7c3aed, #460fa5);"/>
+      <stop stop-color="#7c3aed" offset="100%" data-darkreader-inline-stopcolor="" style="--darkreader-inline-stopcolor: var(--darkreader-background-a78bfa, #220576);"/>
+    </linearGradient>
+    <linearGradient y2="100%" x2="0%" y1="0%" x1="0%" id="gGlass">
+      <stop stop-opacity="0.98" stop-color="#ffffff" offset="0%" data-darkreader-inline-stopcolor="" style="--darkreader-inline-stopcolor: var(--darkreader-background-ffffff, #181a1b);"/>
+      <stop stop-opacity="0.92" stop-color="#ffffff" offset="100%" data-darkreader-inline-stopcolor="" style="--darkreader-inline-stopcolor: var(--darkreader-background-ffffff, #181a1b);"/>
+    </linearGradient>
+    <filter height="140%" width="140%" y="-20%" x="-20%" id="shadow">
+      <feDropShadow flood-opacity="0.18" stdDeviation="2" dy="2" dx="0"/>
+    </filter>
+  </defs>
+  
+  <g filter="url(#shadow)">
+    <rect fill="url(#gGlass)" ry="10" rx="10" height="36" width="40" y="14" x="12"/>
+  </g>
+
+  
+  
+  <path opacity="0.35" fill="url(#g1)" d="M20 46 L20 24 L28 36 L32 26 L36 36 L44 24 L44 46 L38 46 L38 34 L32 24 L26 34 L26 46 Z"/>
+
+  
+  <g filter="url(#shadow)">
+    <path fill="#ffffff" d="M18 44 L18 22 L26 34 L32 24 L38 34 L46 22 L46 44 L40 44 L40 32 L32 22 L24 32 L24 44 Z" data-darkreader-inline-fill="" style="--darkreader-inline-fill: var(--darkreader-background-ffffff, #181a1b);"/>
+    
+    <path stroke-width="1.4" stroke-opacity="0.7" stroke="url(#g1)" fill="none" d="M18 44 L18 22 L26 34 L32 24 L38 34 L46 22 L46 44 L40 44 L40 32 L32 22 L24 32 L24 44 Z"/>
+  </g>
+
+  
+ 
+</svg>
