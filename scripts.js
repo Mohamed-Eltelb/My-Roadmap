@@ -29,6 +29,15 @@ document.addEventListener("DOMContentLoaded", function () {
   const totalItems = document.getElementById("totalItems");
   const completedItems = document.getElementById("completedItems");
   const inProgressItems = document.getElementById("inProgressItems");
+  // Details modal elements
+  const detailsModal = document.getElementById("detailsModal");
+  const closeDetailsBtn = document.getElementById("closeDetailsBtn");
+  const detailsTitle = document.getElementById("detailsTitle");
+  const detailsIcon = document.getElementById("detailsIcon");
+  const detailsName = document.getElementById("detailsName");
+  const detailsMeta = document.getElementById("detailsMeta");
+  const detailsBody = document.getElementById("detailsBody");
+  const detailsLinks = document.getElementById("detailsLinks");
   let draggingId = null;
   let searchQuery = "";
   let defaultEmptyHTML = null;
@@ -238,7 +247,10 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     }
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && isModalOpen()) closeModal();
+      if (e.key === "Escape") {
+        if (isModalOpen()) closeModal();
+        if (isDetailsOpen()) closeDetailsModal();
+      }
     });
 
     // Close open menus on outside click
@@ -248,6 +260,21 @@ document.addEventListener("DOMContentLoaded", function () {
       const isMore = target.closest(".more-wrapper");
       if (!isMore) closeAllMoreMenus();
     });
+
+    // Details modal close handlers
+    if (closeDetailsBtn)
+      closeDetailsBtn.addEventListener("click", closeDetailsModal);
+    if (detailsModal) {
+      detailsModal.addEventListener("click", (e) => {
+        if (
+          e.target &&
+          e.target.hasAttribute &&
+          e.target.hasAttribute("data-close")
+        ) {
+          closeDetailsModal();
+        }
+      });
+    }
 
     // Search filter
     if (searchInput) {
@@ -490,20 +517,46 @@ document.addEventListener("DOMContentLoaded", function () {
                             </button>
                             <div class="more-options" role="menu">
                                 <button class="more-item" data-action="edit" role="menuitem">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M3.25 22a.75.75 0 0 1 .75-.75h16a.75.75 0 0 1 0 1.5H4a.75.75 0 0 1-.75-.75" clip-rule="evenodd"/><path fill="currentColor" d="m11.52 14.929l5.917-5.917a8.2 8.2 0 0 1-2.661-1.787a8.2 8.2 0 0 1-1.788-2.662L7.07 10.48c-.462.462-.693.692-.891.947a5.2 5.2 0 0 0-.599.969c-.139.291-.242.601-.449 1.22l-1.088 3.267a.848.848 0 0 0 1.073 1.073l3.266-1.088c.62-.207.93-.31 1.221-.45q.518-.246.969-.598c.255-.199.485-.43.947-.891m7.56-7.559a3.146 3.146 0 0 0-4.45-4.449l-.71.71l.031.09c.26.749.751 1.732 1.674 2.655A7 7 0 0 0 18.37 8.08z"/></svg>
+                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+                                        <path d="M2.6687 11.333V8.66699C2.6687 7.74455 2.66841 7.01205 2.71655 6.42285C2.76533 5.82612 2.86699 5.31731 3.10425 4.85156L3.25854 4.57617C3.64272 3.94975 4.19392 3.43995 4.85229 3.10449L5.02905 3.02149C5.44666 2.84233 5.90133 2.75849 6.42358 2.71582C7.01272 2.66769 7.74445 2.66797 8.66675 2.66797H9.16675C9.53393 2.66797 9.83165 2.96586 9.83179 3.33301C9.83179 3.70028 9.53402 3.99805 9.16675 3.99805H8.66675C7.7226 3.99805 7.05438 3.99834 6.53198 4.04102C6.14611 4.07254 5.87277 4.12568 5.65601 4.20313L5.45581 4.28906C5.01645 4.51293 4.64872 4.85345 4.39233 5.27149L4.28979 5.45508C4.16388 5.7022 4.08381 6.01663 4.04175 6.53125C3.99906 7.05373 3.99878 7.7226 3.99878 8.66699V11.333C3.99878 12.2774 3.99906 12.9463 4.04175 13.4688C4.08381 13.9833 4.16389 14.2978 4.28979 14.5449L4.39233 14.7285C4.64871 15.1465 5.01648 15.4871 5.45581 15.7109L5.65601 15.7969C5.87276 15.8743 6.14614 15.9265 6.53198 15.958C7.05439 16.0007 7.72256 16.002 8.66675 16.002H11.3337C12.2779 16.002 12.9461 16.0007 13.4685 15.958C13.9829 15.916 14.2976 15.8367 14.5447 15.7109L14.7292 15.6074C15.147 15.3511 15.4879 14.9841 15.7117 14.5449L15.7976 14.3447C15.8751 14.128 15.9272 13.8546 15.9587 13.4688C16.0014 12.9463 16.0017 12.2774 16.0017 11.333V10.833C16.0018 10.466 16.2997 10.1681 16.6667 10.168C17.0339 10.168 17.3316 10.4659 17.3318 10.833V11.333C17.3318 12.2555 17.3331 12.9879 17.2849 13.5771C17.2422 14.0993 17.1584 14.5541 16.9792 14.9717L16.8962 15.1484C16.5609 15.8066 16.0507 16.3571 15.4246 16.7412L15.1492 16.8955C14.6833 17.1329 14.1739 17.2354 13.5769 17.2842C12.9878 17.3323 12.256 17.332 11.3337 17.332H8.66675C7.74446 17.332 7.01271 17.3323 6.42358 17.2842C5.90135 17.2415 5.44665 17.1577 5.02905 16.9785L4.85229 16.8955C4.19396 16.5601 3.64271 16.0502 3.25854 15.4238L3.10425 15.1484C2.86697 14.6827 2.76534 14.1739 2.71655 13.5771C2.66841 12.9879 2.6687 12.2555 2.6687 11.333ZM13.4646 3.11328C14.4201 2.334 15.8288 2.38969 16.7195 3.28027L16.8865 3.46485C17.6141 4.35685 17.6143 5.64423 16.8865 6.53613L16.7195 6.7207L11.6726 11.7686C11.1373 12.3039 10.4624 12.6746 9.72827 12.8408L9.41089 12.8994L7.59351 13.1582C7.38637 13.1877 7.17701 13.1187 7.02905 12.9707C6.88112 12.8227 6.81199 12.6134 6.84155 12.4063L7.10132 10.5898L7.15991 10.2715C7.3262 9.53749 7.69692 8.86241 8.23218 8.32715L13.2791 3.28027L13.4646 3.11328ZM15.7791 4.2207C15.3753 3.81702 14.7366 3.79124 14.3035 4.14453L14.2195 4.2207L9.17261 9.26856C8.81541 9.62578 8.56774 10.0756 8.45679 10.5654L8.41772 10.7773L8.28296 11.7158L9.22241 11.582L9.43433 11.543C9.92426 11.432 10.3749 11.1844 10.7322 10.8271L15.7791 5.78027L15.8552 5.69629C16.185 5.29194 16.1852 4.708 15.8552 4.30371L15.7791 4.2207Z">
+                                        </path>
+                                    </svg>
                                     Edit
                                 </button>
                                 <button class="more-item" data-action="delete" role="menuitem">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M3 6.524c0-.395.327-.714.73-.714h4.788c.006-.842.098-1.995.932-2.793A3.68 3.68 0 0 1 12 2a3.68 3.68 0 0 1 2.55 1.017c.834.798.926 1.951.932 2.793h4.788c.403 0 .73.32.73.714a.72.72 0 0 1-.73.714H3.73A.72.72 0 0 1 3 6.524"/><path fill="currentColor" fill-rule="evenodd" d="M11.596 22h.808c2.783 0 4.174 0 5.08-.886c.904-.886.996-2.34 1.181-5.246l.267-4.187c.1-1.577.15-2.366-.303-2.866c-.454-.5-1.22-.5-2.753-.5H8.124c-1.533 0-2.3 0-2.753.5s-.404 1.289-.303 2.866l.267 4.188c.185 2.906.277 4.36 1.182 5.245c.905.886 2.296.886 5.079.886m-1.35-9.811c-.04-.434-.408-.75-.82-.707c-.413.043-.713.43-.672.864l.5 5.263c.04.434.408.75.82.707c.413-.044.713-.43.672-.864zm4.329-.707c.412.043.713.43.671.864l-.5 5.263c-.04.434-.409.75-.82.707c-.413-.044-.713-.43-.672-.864l.5-5.264c.04-.433.409-.75.82-.707" clip-rule="evenodd"/></svg>
                                     Delete
                                 </button>
+                                <button class="more-item" data-action="resources" role="menuitem">
+                                      <svg viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg" data-rtl-flip="" class="icon" aria-label="">
+                                          <path d="M16.3965 5.01128C16.3963 4.93399 16.3489 4.87691 16.293 4.85406L16.2354 4.84332C13.9306 4.91764 12.5622 5.32101 10.665 6.34722V16.3716C11.3851 15.9994 12.0688 15.7115 12.7861 15.5015C13.8286 15.1965 14.9113 15.0633 16.2402 15.0435L16.2979 15.0308C16.353 15.0063 16.3965 14.9483 16.3965 14.8755V5.01128ZM3.54492 14.8765C3.54492 14.9725 3.62159 15.0422 3.70117 15.0435L4.19629 15.0562C5.94062 15.1247 7.26036 15.4201 8.65918 16.0484C8.05544 15.1706 7.14706 14.436 6.17871 14.1109V14.1099C5.56757 13.9045 5.16816 13.3314 5.16797 12.6988V4.98882C4.86679 4.93786 4.60268 4.8999 4.28223 4.87457L3.72754 4.84429C3.62093 4.84079 3.54505 4.92417 3.54492 5.01226V14.8765ZM17.7266 14.8755C17.7266 15.6314 17.1607 16.2751 16.4121 16.3628L16.2598 16.3736C15.0122 16.3922 14.0555 16.5159 13.1602 16.7779C12.2629 17.0404 11.3966 17.4508 10.3369 18.0738C10.129 18.1959 9.87099 18.1958 9.66309 18.0738C7.71455 16.9283 6.31974 16.4689 4.12988 16.3853L3.68164 16.3736C2.85966 16.3614 2.21484 15.6838 2.21484 14.8765V5.01226C2.21497 4.15391 2.93263 3.4871 3.77246 3.51519L4.39844 3.54937C4.67996 3.57191 4.92258 3.60421 5.16797 3.64214V2.51031C5.16797 1.44939 6.29018 0.645615 7.31055 1.15679L7.31152 1.15582C8.78675 1.89511 10.0656 3.33006 10.5352 4.91461C12.3595 3.98907 13.8688 3.58817 16.1924 3.51324L16.3506 3.51714C17.1285 3.5741 17.7264 4.23496 17.7266 5.01128V14.8755ZM6.49805 12.6988C6.49824 12.7723 6.5442 12.8296 6.60254 12.8492L6.96289 12.9859C7.85245 13.3586 8.68125 13.9846 9.33496 14.7496V5.5816C9.08794 4.37762 8.13648 3.1566 6.95801 2.47613L6.71582 2.34527C6.67779 2.32617 6.6337 2.32502 6.58301 2.35796C6.52946 2.39279 6.49805 2.44863 6.49805 2.51031V12.6988Z">
+                                          </path>
+                                      </svg>
+                                       Resources
+                                </button>
+                                <button class="more-item" data-action="details" role="menuitem">
+                                      <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg" class="icon-lg shrink-0 text-token-text-secondary"><path d="M10 9.25C10.4142 9.25002 10.75 9.5858 10.75 10V13.333C10.75 13.7472 10.4142 14.083 10 14.083C9.58579 14.083 9.25 13.7472 9.25 13.333V10C9.25 9.58579 9.58579 9.25 10 9.25Z"></path><path d="M10 5.83301C10.5293 5.83303 10.958 6.26273 10.958 6.79199C10.9578 7.3211 10.5291 7.74998 10 7.75C9.47084 7.75 9.04217 7.32111 9.04199 6.79199C9.04199 6.26272 9.47073 5.83301 10 5.83301Z"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M10 2.08496C14.3713 2.08496 17.915 5.62867 17.915 10C17.915 14.3713 14.3713 17.915 10 17.915C5.62867 17.915 2.08496 14.3713 2.08496 10C2.08496 5.62867 5.62867 2.08496 10 2.08496ZM10 3.41504C6.3632 3.41504 3.41504 6.3632 3.41504 10C3.41504 13.6368 6.3632 16.585 10 16.585C13.6368 16.585 16.585 13.6368 16.585 10C16.585 6.3632 13.6368 3.41504 10 3.41504Z"></path></svg>
+                                  Details
+                                </button>
                             </div>
-                            <div class="more-options-mobile" role="menu">
+                              <div class="more-options-mobile" role="menu">
                                 <button class="more-item" data-action="edit" role="menuitem">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M3.25 22a.75.75 0 0 1 .75-.75h16a.75.75 0 0 1 0 1.5H4a.75.75 0 0 1-.75-.75" clip-rule="evenodd"/><path fill="currentColor" d="m11.52 14.929l5.917-5.917a8.2 8.2 0 0 1-2.661-1.787a8.2 8.2 0 0 1-1.788-2.662L7.07 10.48c-.462.462-.693.692-.891.947a5.2 5.2 0 0 0-.599.969c-.139.291-.242.601-.449 1.22l-1.088 3.267a.848.848 0 0 0 1.073 1.073l3.266-1.088c.62-.207.93-.31 1.221-.45q.518-.246.969-.598c.255-.199.485-.43.947-.891m7.56-7.559a3.146 3.146 0 0 0-4.45-4.449l-.71.71l.031.09c.26.749.751 1.732 1.674 2.655A7 7 0 0 0 18.37 8.08z"/></svg>
+                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+                                        <path d="M2.6687 11.333V8.66699C2.6687 7.74455 2.66841 7.01205 2.71655 6.42285C2.76533 5.82612 2.86699 5.31731 3.10425 4.85156L3.25854 4.57617C3.64272 3.94975 4.19392 3.43995 4.85229 3.10449L5.02905 3.02149C5.44666 2.84233 5.90133 2.75849 6.42358 2.71582C7.01272 2.66769 7.74445 2.66797 8.66675 2.66797H9.16675C9.53393 2.66797 9.83165 2.96586 9.83179 3.33301C9.83179 3.70028 9.53402 3.99805 9.16675 3.99805H8.66675C7.7226 3.99805 7.05438 3.99834 6.53198 4.04102C6.14611 4.07254 5.87277 4.12568 5.65601 4.20313L5.45581 4.28906C5.01645 4.51293 4.64872 4.85345 4.39233 5.27149L4.28979 5.45508C4.16388 5.7022 4.08381 6.01663 4.04175 6.53125C3.99906 7.05373 3.99878 7.7226 3.99878 8.66699V11.333C3.99878 12.2774 3.99906 12.9463 4.04175 13.4688C4.08381 13.9833 4.16389 14.2978 4.28979 14.5449L4.39233 14.7285C4.64871 15.1465 5.01648 15.4871 5.45581 15.7109L5.65601 15.7969C5.87276 15.8743 6.14614 15.9265 6.53198 15.958C7.05439 16.0007 7.72256 16.002 8.66675 16.002H11.3337C12.2779 16.002 12.9461 16.0007 13.4685 15.958C13.9829 15.916 14.2976 15.8367 14.5447 15.7109L14.7292 15.6074C15.147 15.3511 15.4879 14.9841 15.7117 14.5449L15.7976 14.3447C15.8751 14.128 15.9272 13.8546 15.9587 13.4688C16.0014 12.9463 16.0017 12.2774 16.0017 11.333V10.833C16.0018 10.466 16.2997 10.1681 16.6667 10.168C17.0339 10.168 17.3316 10.4659 17.3318 10.833V11.333C17.3318 12.2555 17.3331 12.9879 17.2849 13.5771C17.2422 14.0993 17.1584 14.5541 16.9792 14.9717L16.8962 15.1484C16.5609 15.8066 16.0507 16.3571 15.4246 16.7412L15.1492 16.8955C14.6833 17.1329 14.1739 17.2354 13.5769 17.2842C12.9878 17.3323 12.256 17.332 11.3337 17.332H8.66675C7.74446 17.332 7.01271 17.3323 6.42358 17.2842C5.90135 17.2415 5.44665 17.1577 5.02905 16.9785L4.85229 16.8955C4.19396 16.5601 3.64271 16.0502 3.25854 15.4238L3.10425 15.1484C2.86697 14.6827 2.76534 14.1739 2.71655 13.5771C2.66841 12.9879 2.6687 12.2555 2.6687 11.333ZM13.4646 3.11328C14.4201 2.334 15.8288 2.38969 16.7195 3.28027L16.8865 3.46485C17.6141 4.35685 17.6143 5.64423 16.8865 6.53613L16.7195 6.7207L11.6726 11.7686C11.1373 12.3039 10.4624 12.6746 9.72827 12.8408L9.41089 12.8994L7.59351 13.1582C7.38637 13.1877 7.17701 13.1187 7.02905 12.9707C6.88112 12.8227 6.81199 12.6134 6.84155 12.4063L7.10132 10.5898L7.15991 10.2715C7.3262 9.53749 7.69692 8.86241 8.23218 8.32715L13.2791 3.28027L13.4646 3.11328ZM15.7791 4.2207C15.3753 3.81702 14.7366 3.79124 14.3035 4.14453L14.2195 4.2207L9.17261 9.26856C8.81541 9.62578 8.56774 10.0756 8.45679 10.5654L8.41772 10.7773L8.28296 11.7158L9.22241 11.582L9.43433 11.543C9.92426 11.432 10.3749 11.1844 10.7322 10.8271L15.7791 5.78027L15.8552 5.69629C16.185 5.29194 16.1852 4.708 15.8552 4.30371L15.7791 4.2207Z">
+                                        </path>
+                                    </svg>
                                 </button>
                                 <button class="more-item" data-action="delete" role="menuitem">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M3 6.524c0-.395.327-.714.73-.714h4.788c.006-.842.098-1.995.932-2.793A3.68 3.68 0 0 1 12 2a3.68 3.68 0 0 1 2.55 1.017c.834.798.926 1.951.932 2.793h4.788c.403 0 .73.32.73.714a.72.72 0 0 1-.73.714H3.73A.72.72 0 0 1 3 6.524"/><path fill="currentColor" fill-rule="evenodd" d="M11.596 22h.808c2.783 0 4.174 0 5.08-.886c.904-.886.996-2.34 1.181-5.246l.267-4.187c.1-1.577.15-2.366-.303-2.866c-.454-.5-1.22-.5-2.753-.5H8.124c-1.533 0-2.3 0-2.753.5s-.404 1.289-.303 2.866l.267 4.188c.185 2.906.277 4.36 1.182 5.245c.905.886 2.296.886 5.079.886m-1.35-9.811c-.04-.434-.408-.75-.82-.707c-.413.043-.713.43-.672.864l.5 5.263c.04.434.408.75.82.707c.413-.044.713-.43.672-.864zm4.329-.707c.412.043.713.43.671.864l-.5 5.263c-.04.434-.409.75-.82.707c-.413-.044-.713-.43-.672-.864l.5-5.264c.04-.433.409-.75.82-.707" clip-rule="evenodd"/></svg>
+                                </button>
+                                <button class="more-item" data-action="resources" role="menuitem">
+                                    <svg viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg" data-rtl-flip="" class="icon" aria-label="">
+                                        <path d="M16.3965 5.01128C16.3963 4.93399 16.3489 4.87691 16.293 4.85406L16.2354 4.84332C13.9306 4.91764 12.5622 5.32101 10.665 6.34722V16.3716C11.3851 15.9994 12.0688 15.7115 12.7861 15.5015C13.8286 15.1965 14.9113 15.0633 16.2402 15.0435L16.2979 15.0308C16.353 15.0063 16.3965 14.9483 16.3965 14.8755V5.01128ZM3.54492 14.8765C3.54492 14.9725 3.62159 15.0422 3.70117 15.0435L4.19629 15.0562C5.94062 15.1247 7.26036 15.4201 8.65918 16.0484C8.05544 15.1706 7.14706 14.436 6.17871 14.1109V14.1099C5.56757 13.9045 5.16816 13.3314 5.16797 12.6988V4.98882C4.86679 4.93786 4.60268 4.8999 4.28223 4.87457L3.72754 4.84429C3.62093 4.84079 3.54505 4.92417 3.54492 5.01226V14.8765ZM17.7266 14.8755C17.7266 15.6314 17.1607 16.2751 16.4121 16.3628L16.2598 16.3736C15.0122 16.3922 14.0555 16.5159 13.1602 16.7779C12.2629 17.0404 11.3966 17.4508 10.3369 18.0738C10.129 18.1959 9.87099 18.1958 9.66309 18.0738C7.71455 16.9283 6.31974 16.4689 4.12988 16.3853L3.68164 16.3736C2.85966 16.3614 2.21484 15.6838 2.21484 14.8765V5.01226C2.21497 4.15391 2.93263 3.4871 3.77246 3.51519L4.39844 3.54937C4.67996 3.57191 4.92258 3.60421 5.16797 3.64214V2.51031C5.16797 1.44939 6.29018 0.645615 7.31055 1.15679L7.31152 1.15582C8.78675 1.89511 10.0656 3.33006 10.5352 4.91461C12.3595 3.98907 13.8688 3.58817 16.1924 3.51324L16.3506 3.51714C17.1285 3.5741 17.7264 4.23496 17.7266 5.01128V14.8755ZM6.49805 12.6988C6.49824 12.7723 6.5442 12.8296 6.60254 12.8492L6.96289 12.9859C7.85245 13.3586 8.68125 13.9846 9.33496 14.7496V5.5816C9.08794 4.37762 8.13648 3.1566 6.95801 2.47613L6.71582 2.34527C6.67779 2.32617 6.6337 2.32502 6.58301 2.35796C6.52946 2.39279 6.49805 2.44863 6.49805 2.51031V12.6988Z">
+                                        </path>
+                                    </svg>
+                                </button>
+                                <button class="more-item" data-action="details" role="menuitem">
+                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg" class="icon-lg shrink-0 text-token-text-secondary"><path d="M10 9.25C10.4142 9.25002 10.75 9.5858 10.75 10V13.333C10.75 13.7472 10.4142 14.083 10 14.083C9.58579 14.083 9.25 13.7472 9.25 13.333V10C9.25 9.58579 9.58579 9.25 10 9.25Z"></path><path d="M10 5.83301C10.5293 5.83303 10.958 6.26273 10.958 6.79199C10.9578 7.3211 10.5291 7.74998 10 7.75C9.47084 7.75 9.04217 7.32111 9.04199 6.79199C9.04199 6.26272 9.47073 5.83301 10 5.83301Z"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M10 2.08496C14.3713 2.08496 17.915 5.62867 17.915 10C17.915 14.3713 14.3713 17.915 10 17.915C5.62867 17.915 2.08496 14.3713 2.08496 10C2.08496 5.62867 5.62867 2.08496 10 2.08496ZM10 3.41504C6.3632 3.41504 3.41504 6.3632 3.41504 10C3.41504 13.6368 6.3632 16.585 10 16.585C13.6368 16.585 16.585 13.6368 16.585 10C16.585 6.3632 13.6368 3.41504 10 3.41504Z"></path></svg>
                                 </button>
                             </div>
                         </div>
@@ -512,14 +565,23 @@ document.addEventListener("DOMContentLoaded", function () {
     // Add event listeners to buttons
     const toggleBtn = itemDiv.querySelector('[data-action="toggle"]');
     const deleteBtn = itemDiv.querySelector('[data-action="delete"]');
-    const deleteBtnMobile = itemDiv.querySelector(
-      '.more-options-mobile [data-action="delete"]'
-    );
     const moreBtn = itemDiv.querySelector('[data-action="more"]');
     const moreMenu = itemDiv.querySelector(".more-options");
     const editBtn = itemDiv.querySelector('[data-action="edit"]');
+    const resourcesBtn = itemDiv.querySelector('[data-action="resources"]');
+    const detailsBtn = itemDiv.querySelector('[data-action="details"]');
+
+    const deleteBtnMobile = itemDiv.querySelector(
+      '.more-options-mobile [data-action="delete"]'
+    );
     const editBtnMobile = itemDiv.querySelector(
       '.more-options-mobile [data-action="edit"]'
+    );
+    const detailsBtnMobile = itemDiv.querySelector(
+      '.more-options-mobile [data-action="details"]'
+    );
+    const resourcesBtnMobile = itemDiv.querySelector(
+      '.more-options-mobile [data-action="resources"]'
     );
 
     toggleBtn.addEventListener("click", function () {
@@ -541,6 +603,24 @@ document.addEventListener("DOMContentLoaded", function () {
         });
       });
     }
+
+    if (detailsBtn) {
+      [detailsBtn, detailsBtnMobile].forEach((btn) => {
+        btn.addEventListener("click", function (e) {
+          e.stopPropagation();
+          closeAllMoreMenus();
+          openDetailsModal(item);
+        });
+      });
+    }
+
+    [resourcesBtn, resourcesBtnMobile].forEach((btn) => {
+      btn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        closeAllMoreMenus();
+        window.location.href = `${window.location.origin}/learn/${item.language}`;
+      });
+    });
 
     if (moreBtn && moreMenu) {
       moreBtn.addEventListener("click", (e) => {
@@ -625,6 +705,262 @@ document.addEventListener("DOMContentLoaded", function () {
     return itemDiv;
   }
 
+  // Details modal helpers
+  function isDetailsOpen() {
+    return detailsModal && detailsModal.classList.contains("open");
+  }
+
+  function openDetailsModal(item) {
+    if (!detailsModal) return;
+    // Title
+    if (detailsTitle) detailsTitle.textContent = "Details";
+    // Icon
+    if (detailsIcon) detailsIcon.innerHTML = iconForLanguage(item.language);
+    // Name and meta
+    if (detailsName) detailsName.textContent = `${item.language || "Custom"}`;
+    const status = item.completed ? "Completed" : "In Progress";
+    const created = item.createdAt
+      ? new Date(item.createdAt).toLocaleString()
+      : "";
+    const completed = item.completedAt
+      ? new Date(item.completedAt).toLocaleString()
+      : null;
+    if (detailsMeta) {
+      //   detailsMeta.textContent = `${status}${
+      //     created ? ` • Created ${created}` : ""
+      //   }${completed ? ` • Completed ${completed}` : ""}`;
+      detailsMeta.textContent = status;
+    }
+    // Body
+    if (detailsBody) {
+      //   const lang = (item.language || "").trim();
+      //   const label = lang ? lang[0].toUpperCase() + lang.slice(1) : "Language";
+      //   detailsBody.innerHTML = `Quick info about <strong>${label}</strong>. Explore the resources below to deepen your understanding.`;
+      //show the start date and completetion date
+      detailsBody.innerHTML = `
+			<div class="details-card">
+				<div class="details-row">
+					<span class="label">Start Date:</span>
+					<span class="value">${created || "<em>undefined</em>"}</span>
+				</div>
+				<div class="details-row">
+					<span class="label">Completion Date:</span>
+					<span class="value">${completed || "<em>Not Completed Yet</em>"}</span>
+				</div>
+			
+				<div class="details-item">
+					<span class="label">Description:</span>
+					<span class="value">${item.description || "<em>No Description Available</em>"}</span>
+				</div>
+			</div>
+			`;
+    }
+
+    // <div class="details-item">
+    // 	<span class="held-label">Category:</span>
+    // 	<span class="held-value">Web Development</span>
+    // </div>
+
+    // <div class="details-item">
+    // 	<span class="held-label">Difficulty:</span>
+    // 	<span class="held-value">Intermediate</span>
+    // </div>
+
+
+    // Links
+    // if (detailsLinks) {
+    //   detailsLinks.innerHTML = "";
+    //   const lang = (item.language || "").toLowerCase();
+    //   const links = buildLanguageLinks(lang);
+    //   links.forEach(({ href, label }) => {
+    //     const a = document.createElement("a");
+    //     a.href = href;
+    //     a.target = "_blank";
+    //     a.rel = "noopener noreferrer";
+    //     a.className = "btn btn-outline";
+    //     a.textContent = label;
+    //     detailsLinks.appendChild(a);
+    //   });
+    // }
+
+    // Links
+    if (detailsLinks) {
+      detailsLinks.innerHTML = "";
+      //add the edit, delete, and resources buttons
+      const editBtn = document.createElement("button");
+      editBtn.innerHTML = `<svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+								<path d="M2.6687 11.333V8.66699C2.6687 7.74455 2.66841 7.01205 2.71655 6.42285C2.76533 5.82612 2.86699 5.31731 3.10425 4.85156L3.25854 4.57617C3.64272 3.94975 4.19392 3.43995 4.85229 3.10449L5.02905 3.02149C5.44666 2.84233 5.90133 2.75849 6.42358 2.71582C7.01272 2.66769 7.74445 2.66797 8.66675 2.66797H9.16675C9.53393 2.66797 9.83165 2.96586 9.83179 3.33301C9.83179 3.70028 9.53402 3.99805 9.16675 3.99805H8.66675C7.7226 3.99805 7.05438 3.99834 6.53198 4.04102C6.14611 4.07254 5.87277 4.12568 5.65601 4.20313L5.45581 4.28906C5.01645 4.51293 4.64872 4.85345 4.39233 5.27149L4.28979 5.45508C4.16388 5.7022 4.08381 6.01663 4.04175 6.53125C3.99906 7.05373 3.99878 7.7226 3.99878 8.66699V11.333C3.99878 12.2774 3.99906 12.9463 4.04175 13.4688C4.08381 13.9833 4.16389 14.2978 4.28979 14.5449L4.39233 14.7285C4.64871 15.1465 5.01648 15.4871 5.45581 15.7109L5.65601 15.7969C5.87276 15.8743 6.14614 15.9265 6.53198 15.958C7.05439 16.0007 7.72256 16.002 8.66675 16.002H11.3337C12.2779 16.002 12.9461 16.0007 13.4685 15.958C13.9829 15.916 14.2976 15.8367 14.5447 15.7109L14.7292 15.6074C15.147 15.3511 15.4879 14.9841 15.7117 14.5449L15.7976 14.3447C15.8751 14.128 15.9272 13.8546 15.9587 13.4688C16.0014 12.9463 16.0017 12.2774 16.0017 11.333V10.833C16.0018 10.466 16.2997 10.1681 16.6667 10.168C17.0339 10.168 17.3316 10.4659 17.3318 10.833V11.333C17.3318 12.2555 17.3331 12.9879 17.2849 13.5771C17.2422 14.0993 17.1584 14.5541 16.9792 14.9717L16.8962 15.1484C16.5609 15.8066 16.0507 16.3571 15.4246 16.7412L15.1492 16.8955C14.6833 17.1329 14.1739 17.2354 13.5769 17.2842C12.9878 17.3323 12.256 17.332 11.3337 17.332H8.66675C7.74446 17.332 7.01271 17.3323 6.42358 17.2842C5.90135 17.2415 5.44665 17.1577 5.02905 16.9785L4.85229 16.8955C4.19396 16.5601 3.64271 16.0502 3.25854 15.4238L3.10425 15.1484C2.86697 14.6827 2.76534 14.1739 2.71655 13.5771C2.66841 12.9879 2.6687 12.2555 2.6687 11.333ZM13.4646 3.11328C14.4201 2.334 15.8288 2.38969 16.7195 3.28027L16.8865 3.46485C17.6141 4.35685 17.6143 5.64423 16.8865 6.53613L16.7195 6.7207L11.6726 11.7686C11.1373 12.3039 10.4624 12.6746 9.72827 12.8408L9.41089 12.8994L7.59351 13.1582C7.38637 13.1877 7.17701 13.1187 7.02905 12.9707C6.88112 12.8227 6.81199 12.6134 6.84155 12.4063L7.10132 10.5898L7.15991 10.2715C7.3262 9.53749 7.69692 8.86241 8.23218 8.32715L13.2791 3.28027L13.4646 3.11328ZM15.7791 4.2207C15.3753 3.81702 14.7366 3.79124 14.3035 4.14453L14.2195 4.2207L9.17261 9.26856C8.81541 9.62578 8.56774 10.0756 8.45679 10.5654L8.41772 10.7773L8.28296 11.7158L9.22241 11.582L9.43433 11.543C9.92426 11.432 10.3749 11.1844 10.7322 10.8271L15.7791 5.78027L15.8552 5.69629C16.185 5.29194 16.1852 4.708 15.8552 4.30371L15.7791 4.2207Z">
+								</path>
+                            </svg> Edit`;
+      editBtn.className = "btn btn-outline";
+      editBtn.addEventListener("click", () => {
+        closeDetailsModal();
+        openEditModal(item);
+      });
+      detailsLinks.appendChild(editBtn);
+
+      const deleteBtn = document.createElement("button");
+      deleteBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M3 6.524c0-.395.327-.714.73-.714h4.788c.006-.842.098-1.995.932-2.793A3.68 3.68 0 0 1 12 2a3.68 3.68 0 0 1 2.55 1.017c.834.798.926 1.951.932 2.793h4.788c.403 0 .73.32.73.714a.72.72 0 0 1-.73.714H3.73A.72.72 0 0 1 3 6.524"/><path fill="currentColor" fill-rule="evenodd" d="M11.596 22h.808c2.783 0 4.174 0 5.08-.886c.904-.886.996-2.34 1.181-5.246l.267-4.187c.1-1.577.15-2.366-.303-2.866c-.454-.5-1.22-.5-2.753-.5H8.124c-1.533 0-2.3 0-2.753.5s-.404 1.289-.303 2.866l.267 4.188c.185 2.906.277 4.36 1.182 5.245c.905.886 2.296.886 5.079.886m-1.35-9.811c-.04-.434-.408-.75-.82-.707c-.413.043-.713.43-.672.864l.5 5.263c.04.434.408.75.82.707c.413-.044.713-.43.672-.864zm4.329-.707c.412.043.713.43.671.864l-.5 5.263c-.04.434-.409.75-.82.707c-.413-.044-.713-.43-.672-.864l.5-5.264c.04-.433.409-.75.82-.707" clip-rule="evenodd"/></svg> Delete`;
+      deleteBtn.className = "btn btn-outline";
+      deleteBtn.addEventListener("click", () => {
+        closeDetailsModal();
+        deleteItem(item.id);
+      });
+      detailsLinks.appendChild(deleteBtn);
+
+      const resourcesBtn = document.createElement("button");
+      resourcesBtn.innerHTML = `<svg viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg" data-rtl-flip="" class="icon" aria-label="">
+									<path d="M16.3965 5.01128C16.3963 4.93399 16.3489 4.87691 16.293 4.85406L16.2354 4.84332C13.9306 4.91764 12.5622 5.32101 10.665 6.34722V16.3716C11.3851 15.9994 12.0688 15.7115 12.7861 15.5015C13.8286 15.1965 14.9113 15.0633 16.2402 15.0435L16.2979 15.0308C16.353 15.0063 16.3965 14.9483 16.3965 14.8755V5.01128ZM3.54492 14.8765C3.54492 14.9725 3.62159 15.0422 3.70117 15.0435L4.19629 15.0562C5.94062 15.1247 7.26036 15.4201 8.65918 16.0484C8.05544 15.1706 7.14706 14.436 6.17871 14.1109V14.1099C5.56757 13.9045 5.16816 13.3314 5.16797 12.6988V4.98882C4.86679 4.93786 4.60268 4.8999 4.28223 4.87457L3.72754 4.84429C3.62093 4.84079 3.54505 4.92417 3.54492 5.01226V14.8765ZM17.7266 14.8755C17.7266 15.6314 17.1607 16.2751 16.4121 16.3628L16.2598 16.3736C15.0122 16.3922 14.0555 16.5159 13.1602 16.7779C12.2629 17.0404 11.3966 17.4508 10.3369 18.0738C10.129 18.1959 9.87099 18.1958 9.66309 18.0738C7.71455 16.9283 6.31974 16.4689 4.12988 16.3853L3.68164 16.3736C2.85966 16.3614 2.21484 15.6838 2.21484 14.8765V5.01226C2.21497 4.15391 2.93263 3.4871 3.77246 3.51519L4.39844 3.54937C4.67996 3.57191 4.92258 3.60421 5.16797 3.64214V2.51031C5.16797 1.44939 6.29018 0.645615 7.31055 1.15679L7.31152 1.15582C8.78675 1.89511 10.0656 3.33006 10.5352 4.91461C12.3595 3.98907 13.8688 3.58817 16.1924 3.51324L16.3506 3.51714C17.1285 3.5741 17.7264 4.23496 17.7266 5.01128V14.8755ZM6.49805 12.6988C6.49824 12.7723 6.5442 12.8296 6.60254 12.8492L6.96289 12.9859C7.85245 13.3586 8.68125 13.9846 9.33496 14.7496V5.5816C9.08794 4.37762 8.13648 3.1566 6.95801 2.47613L6.71582 2.34527C6.67779 2.32617 6.6337 2.32502 6.58301 2.35796C6.52946 2.39279 6.49805 2.44863 6.49805 2.51031V12.6988Z">
+									</path>
+                                </svg> Resources`;
+      resourcesBtn.className = "btn btn-outline";
+      resourcesBtn.addEventListener("click", () => {
+        closeDetailsModal();
+        window.location.href = `${window.location.origin}/learn/${item.language}`;
+      });
+      detailsLinks.appendChild(resourcesBtn);
+    }
+
+    detailsModal.classList.add("open");
+    detailsModal.setAttribute("aria-hidden", "false");
+    document.body.classList.add("modal-open");
+    trapFocus(detailsModal);
+    // focus close button for accessibility
+    if (closeDetailsBtn) setTimeout(() => closeDetailsBtn.focus(), 50);
+  }
+
+  function closeDetailsModal() {
+    if (!detailsModal) return;
+    detailsModal.classList.remove("open");
+    detailsModal.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("modal-open");
+    releaseFocus(detailsModal);
+  }
+
+  function buildLanguageLinks(lang) {
+    const q = encodeURIComponent(lang);
+    const links = [];
+    // Common docs
+    const map = {
+      javascript: [
+        {
+          href: "https://developer.mozilla.org/en-US/docs/Web/JavaScript",
+          label: "MDN Docs",
+        },
+        { href: "https://javascript.info/", label: "JavaScript.info" },
+      ],
+      typescript: [
+        { href: "https://www.typescriptlang.org/docs/", label: "TS Docs" },
+      ],
+      python: [{ href: "https://docs.python.org/3/", label: "Python Docs" }],
+      java: [
+        {
+          href: "https://docs.oracle.com/javase/tutorial/",
+          label: "Java Tutorials",
+        },
+      ],
+      csharp: [
+        {
+          href: "https://learn.microsoft.com/dotnet/csharp/",
+          label: "C# Docs",
+        },
+      ],
+      "c#": [
+        {
+          href: "https://learn.microsoft.com/dotnet/csharp/",
+          label: "C# Docs",
+        },
+      ],
+      "c++": [
+        { href: "https://en.cppreference.com/w/", label: "C++ Reference" },
+      ],
+      go: [{ href: "https://go.dev/doc/", label: "Go Docs" }],
+      rust: [
+        { href: "https://doc.rust-lang.org/book/", label: "The Rust Book" },
+      ],
+      php: [{ href: "https://www.php.net/docs.php", label: "PHP Docs" }],
+      ruby: [
+        {
+          href: "https://www.ruby-lang.org/en/documentation/",
+          label: "Ruby Docs",
+        },
+      ],
+      kotlin: [
+        { href: "https://kotlinlang.org/docs/home.html", label: "Kotlin Docs" },
+      ],
+      swift: [
+        {
+          href: "https://developer.apple.com/documentation/",
+          label: "Apple Docs",
+        },
+      ],
+      react: [{ href: "https://react.dev/learn", label: "React Docs" }],
+      "react-native": [
+        {
+          href: "https://reactnative.dev/docs/getting-started",
+          label: "RN Docs",
+        },
+      ],
+      vue: [
+        {
+          href: "https://vuejs.org/guide/introduction.html",
+          label: "Vue Docs",
+        },
+      ],
+      angular: [{ href: "https://angular.dev/", label: "Angular Docs" }],
+      svelte: [{ href: "https://svelte.dev/docs", label: "Svelte Docs" }],
+      nextjs: [{ href: "https://nextjs.org/docs", label: "Next.js Docs" }],
+      node: [{ href: "https://nodejs.org/en/docs", label: "Node.js Docs" }],
+      express: [{ href: "https://expressjs.com/", label: "Express Docs" }],
+      django: [
+        {
+          href: "https://docs.djangoproject.com/en/stable/",
+          label: "Django Docs",
+        },
+      ],
+      flask: [
+        {
+          href: "https://flask.palletsprojects.com/en/stable/",
+          label: "Flask Docs",
+        },
+      ],
+      spring: [
+        {
+          href: "https://spring.io/projects/spring-boot",
+          label: "Spring Boot",
+        },
+      ],
+      mongodb: [
+        { href: "https://www.mongodb.com/docs/", label: "MongoDB Docs" },
+      ],
+      postgresql: [
+        { href: "https://www.postgresql.org/docs/", label: "PostgreSQL Docs" },
+      ],
+      mysql: [{ href: "https://dev.mysql.com/doc/", label: "MySQL Docs" }],
+      sqlite: [
+        { href: "https://www.sqlite.org/docs.html", label: "SQLite Docs" },
+      ],
+      tailwind: [
+        {
+          href: "https://tailwindcss.com/docs/installation",
+          label: "Tailwind Docs",
+        },
+      ],
+      webpack: [
+        { href: "https://webpack.js.org/concepts/", label: "Webpack Docs" },
+      ],
+    };
+
+    const std = map[lang];
+    if (std && Array.isArray(std)) links.push(...std);
+    // Always add a search link
+    links.push({
+      href: `https://www.google.com/search?q=${q}+documentation`,
+      label: "Search docs",
+    });
+    return links;
+  }
+
   function reorderItems(srcId, targetId) {
     const srcIndex = items.findIndex((it) => it.id === srcId);
     const targetIndex = items.findIndex((it) => it.id === targetId);
@@ -659,6 +995,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Add a new item to the roadmap
   function addNewItem() {
     let title = document.getElementById("itemTitle").value;
+    const description = document.getElementById("itemDescription").value;
     const language = languageSelect.value;
     const isValidLang = iconForLanguage(language);
     if (!language.trim() || !isValidLang) {
@@ -686,6 +1023,7 @@ document.addEventListener("DOMContentLoaded", function () {
               ...it,
               title: title,
               language: language,
+              description: description,
             }
           : it
       );
@@ -699,6 +1037,7 @@ document.addEventListener("DOMContentLoaded", function () {
         id: Date.now(), // Simple ID generation
         title: title,
         language: language,
+        description: description,
         completed: false,
         createdAt: Date.now(),
         completedAt: null,
@@ -827,6 +1166,8 @@ document.addEventListener("DOMContentLoaded", function () {
     // prefill
     const titleInput = document.getElementById("itemTitle");
     if (titleInput) titleInput.value = item.title;
+    const descriptionInput = document.getElementById("itemDescription");
+    if (descriptionInput) descriptionInput.value = item.description || "";
     if (languageSelect) {
       languageSelect.value = item.language;
       handleLanguageChange(item.language);

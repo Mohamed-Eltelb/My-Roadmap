@@ -19,7 +19,7 @@
     <div class="container">
         <header class="hero-header">
             <div class="badge">Interactive • Personal</div>
-            <h1>My Learning Roadmap</h1>
+            <h1>My Development Roadmap</h1>
             <p class="subtitle">Track your progress and achieve your development goals</p>
             <div class="hero-actions">
                 <button class="btn btn-primary btn-lg" data-open-add>
@@ -185,6 +185,11 @@
                             </div>
                         </div>
 
+                        <div class="form-group">
+                            <label for="itemDescription">Description</label>
+                            <textarea id="itemDescription" placeholder="e.g., Learn React by building a simple app"></textarea>
+                        </div>
+
                         <div class="form-group form-submit">
                             <p class="error-log" id="errorLog"></p>
                             <button type="submit" class="btn btn-primary">
@@ -192,6 +197,29 @@
                             </button>
                         </div>
                     </form>
+                </div>
+            </div>
+
+            <!-- Modal: Language Details -->
+            <div class="modal" id="detailsModal" aria-hidden="true">
+                <div class="modal-backdrop" data-close></div>
+                <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="detailsTitle">
+                    <button type="button" class="modal-close" id="closeDetailsBtn" aria-label="Close">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <h2 class="form-title" id="detailsTitle">Details</h2>
+                    <div class="form-group" style="display:flex; align-items:center; gap:12px;">
+                        <div class="language-icon" id="detailsIcon"><i class="fas fa-code"></i></div>
+                        <div>
+                            <div id="detailsName" style="font-weight:600;">Language</div>
+                            <div id="detailsMeta" style="color: var(--text-secondary); font-size: 0.9rem;"></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div id="detailsBody" style="color: var(--text-primary);"></div>
+                    </div>
+                    <div class="form-group form-submit" id="detailsLinks" style="justify-content: start; gap:8px;">
+                    </div>
                 </div>
             </div>
         </div>
