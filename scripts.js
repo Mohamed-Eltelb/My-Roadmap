@@ -1,4 +1,17 @@
-import { languageIcons } from "./languageIcons.js";
+import { languageIcons, languageInfo } from "./languagesData.js";
+
+const sections = [];
+
+for (const key in languageInfo) {
+  const sectionName = languageInfo[key].section;
+  if (sections.find((section) => section.name === sectionName)) {
+    sections.find((section) => section.name === sectionName).count++;
+    sections.find((section) => section.name === sectionName).langs.push(key);
+  } else {
+    sections.push({ name: sectionName, count: 1, langs: [key] });
+  }
+}
+console.log(sections);
 
 document.addEventListener("DOMContentLoaded", function () {
   // DOM Elements
@@ -750,7 +763,9 @@ document.addEventListener("DOMContentLoaded", function () {
 			
 				<div class="details-item">
 					<span class="label">Description:</span>
-					<span class="value">${item.description || "<em>No Description Available</em>"}</span>
+					<span class="value">${
+            item.description || "<em>No Description Available</em>"
+          }</span>
 				</div>
 			</div>
 			`;
@@ -765,7 +780,6 @@ document.addEventListener("DOMContentLoaded", function () {
     // 	<span class="held-label">Difficulty:</span>
     // 	<span class="held-value">Intermediate</span>
     // </div>
-
 
     // Links
     // if (detailsLinks) {

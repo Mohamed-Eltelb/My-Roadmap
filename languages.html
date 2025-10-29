@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>All Technologies • My Roadmap</title>
+  <meta name="theme-color" content="#f5f7fb" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="responsive.css" />
+  <link rel="stylesheet" href="langs.css" />
+  <link rel="icon" type="image/svg+xml" href="assets/icons/logo.svg">
+</head>
+
+<body>
+  <div class="container">
+    <header class="hero-header" style="padding-bottom: 1.25rem;">
+      <div class="badge">Catalog</div>
+      <h1>Technologies Catalog</h1>
+      <p class="subtitle">Browse our catalog of technologies</p>
+      <div class="hero-actions">
+        <a href="index.html" class="btn btn-outline btn-lg">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path fill="currentColor"
+              d="M11.03 2.97a.75.75 0 0 1 0 1.06L5.06 10h14.19a.75.75 0 0 1 0 1.5H5.06l5.97 5.97a.75.75 0 1 1-1.06 1.06l-7.25-7.25a.75.75 0 0 1 0-1.06l7.25-7.25a.75.75 0 0 1 1.06 0" />
+          </svg>
+          Back to roadmap
+        </a>
+        <button class="btn btn-primary btn-lg" id="themeToggle" aria-label="Toggle dark mode" aria-pressed="false"
+          title="Toggle dark mode">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path fill="currentColor"
+              d="M19.9 2.307a.483.483 0 0 0-.9 0l-.43 1.095a.48.48 0 0 1-.272.274l-1.091.432a.486.486 0 0 0 0 .903l1.091.432a.48.48 0 0 1 .272.273L19 6.81c.162.41.74.41.9 0l.43-1.095a.48.48 0 0 1 .273-.273l1.091-.432a.486.486 0 0 0 0-.903l-1.091-.432a.48.48 0 0 1-.273-.274zM16.033 8.13a.483.483 0 0 0-.9 0l-.157.399a.48.48 0 0 1-.272.273l-.398.158a.486.486 0 0 0 0 .903l.398.157c.125.05.223.148.272.274l.157.399c.161.41.739.41.9 0l.157-.4a.48.48 0 0 1 .272-.273l.398-.157a.486.486 0 0 0 0-.903l-.398-.158a.48.48 0 0 1-.272-.273z" />
+            <path fill="currentColor"
+              d="M12 22c5.523 0 10-4.477 10-10c0-.463-.694-.54-.933-.143a6.5 6.5 0 1 1-8.924-8.924C12.54 2.693 12.463 2 12 2C6.477 2 2 6.477 2 12s4.477 10 10 10" />
+          </svg>
+          <span style="margin-left: .25rem;">Theme</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="catalog-container" id="catalogContainer" aria-live="polite"></main>
+  </div>
+
+  <script type="module">
+    import { languageIcons, languageInfo } from './languagesData.js';
+
+    // Minimal theme setup (reuse storage key and [data-theme] convention)
+    const themeToggle = document.getElementById('themeToggle');
+    function applyTheme(theme) {
+      const root = document.documentElement;
+      root.setAttribute('data-theme', theme === 'dark' ? 'dark' : 'light');
+      if (themeToggle) {
+        const isDark = theme === 'dark';
+        themeToggle.setAttribute('aria-pressed', String(isDark));
+        themeToggle.title = isDark ? 'Switch to light mode' : 'Switch to dark mode';
+      }
+    }
+    function getPreferredTheme() {
+      const stored = localStorage.getItem('theme');
+      if (stored === 'light' || stored === 'dark') return stored;
+      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      return prefersDark ? 'dark' : 'light';
+    }
+    (function setupTheme() {
+      applyTheme(getPreferredTheme());
+      if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+          const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+          const next = current === 'dark' ? 'light' : 'dark';
+          applyTheme(next);
+          try { localStorage.setItem('theme', next); } catch (_) { }
+        });
+      }
+      if (window.matchMedia) {
+        const media = window.matchMedia('(prefers-color-scheme: dark)');
+        const onChange = (e) => {
+          const stored = localStorage.getItem('theme');
+          if (stored !== 'light' && stored !== 'dark') applyTheme(e.matches ? 'dark' : 'light');
+        };
+        media.addEventListener ? media.addEventListener('change', onChange) : media.addListener(onChange);
+      }
+    })();
+
+    // Alias mapping similar to main page for icon resolution
+    const aliasMap = {
+      'react.js': 'react',
+      'reactjs': 'react',
+      'react native': 'react-native',
+      'next': 'nextjs',
+      'next.js': 'nextjs',
+      'nuxt': 'nuxtjs',
+      'nuxt.js': 'nuxtjs',
+      'solid': 'solidjs',
+      'three': 'threejs',
+      'd3': 'd3js',
+      'node.js': 'node',
+      'nodejs': 'node',
+      'ts': 'typescript',
+      'js': 'javascript',
+      'postgres': 'postgresql',
+      'postgre': 'postgresql',
+      'mongo': 'mongodb',
+      'sqlite3': 'sqlite',
+      'tailwindcss': 'tailwind',
+      'material-ui': 'materialui',
+      'mui': 'materialui',
+      'cpp': 'c++',
+      'csharp': 'c#',
+      'f#': 'fsharp',
+      'objective c': 'objective-c',
+      'dotnet': '.net',
+      'asp.net': 'aspnet',
+    };
+    function iconFor(key) {
+      if (!key) return languageIcons.custom ?? '';
+      const norm = String(key).trim().toLowerCase();
+      if (languageIcons[norm]) return languageIcons[norm];
+      const aliased = aliasMap[norm];
+      if (aliased && languageIcons[aliased]) return languageIcons[aliased];
+      return languageIcons.custom ?? '';
+    }
+
+    // Group by section and sort
+    const groups = new Map();
+    for (const [key, info] of Object.entries(languageInfo)) {
+      const section = (info.section || 'Other').trim();
+      if (!groups.has(section)) groups.set(section, []);
+      groups.get(section).push({ key, ...info });
+    }
+    const sortedSections = Array.from(groups.keys()).sort((a, b) => a.localeCompare(b));
+
+    const container = document.getElementById('catalogContainer');
+    function cardTemplate(item) {
+      const icon = iconFor(item.key);
+      const name = item.name || item.key;
+      const desc = item.description || 'No description available.';
+      const type = item.type || '';
+      const learnHref = `${window.location.origin}/learn/${encodeURIComponent(item.key)}`;
+      return `
+        <article class="catalog-card" data-key="${item.key}">
+          <div class="catalog-header">
+            <div class="item-icon">${icon}</div>
+            <div class="catalog-titles">
+              <h3 class="item-name">${name}</h3>
+              ${type ? `<span class="item-type">${type}</span>` : ''}
+            </div>
+          </div>
+          <p class="item-desc">${desc}</p>
+          <div class="catalog-actions">
+            <a class="btn btn-outline" href="${item.resources[0].docs}">
+            View resources
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M13.47 5.47a.75.75 0 0 1 1.06 0l6 6a.75.75 0 0 1 0 1.06l-6 6a.75.75 0 1 1-1.06-1.06l4.72-4.72H4a.75.75 0 0 1 0-1.5h14.19l-4.72-4.72a.75.75 0 0 1 0-1.06" clip-rule="evenodd"/></svg>
+            </a>
+          </div>
+        </article>
+      `;
+    }
+
+    for (const section of sortedSections) {
+      const items = groups.get(section).slice().sort((a, b) => (a.name || a.key).localeCompare(b.name || b.key));
+      const sectionEl = document.createElement('section');
+      sectionEl.className = 'catalog-section';
+      sectionEl.innerHTML = `
+        <div class="section-header">
+          <h2>${section}</h2>
+          <span class="count">${items.length}</span>
+        </div>
+        <div class="catalog-grid">
+          ${items.map(cardTemplate).join('')}
+        </div>
+      `;
+      container.appendChild(sectionEl);
+    }
+  </script>
+</body>
+
+</html>

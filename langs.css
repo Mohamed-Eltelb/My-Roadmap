@@ -1,0 +1,134 @@
+/* Catalog page (languages.html) */
+.catalog-container {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  margin: 10px 0 40px;
+}
+
+.catalog-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+}
+
+.section-header h2 {
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.section-header .count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  height: 28px;
+  padding: 0 10px;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  background: var(--muted-surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+}
+
+.catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.catalog-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.catalog-card:hover {
+  transform: translateY(-2px);
+}
+
+.catalog-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.catalog-header .item-icon {
+  width: 46px;
+  height: 46px;
+  /* background: var(--bg-card); */
+  /* border: 1px solid var(--glass-border); */
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+}
+
+.catalog-titles {
+  display: flex;
+  flex-direction: column;
+}
+
+.catalog-titles .item-name {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.catalog-titles .item-type {
+  width: fit-content;
+  margin-top: 4px;
+  padding: 2px 8px;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  background: var(--muted-surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+}
+
+.item-desc {
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+}
+
+.catalog-actions {
+  margin-top: auto;
+  display: flex;
+  justify-content: end;
+}
+
+.catalog-actions a{
+padding: 5px 8px;
+}
+.catalog-actions a svg {
+  width: 20px;
+  height: 20px;
+}
+
+@media (max-width: 640px) {
+  .section-header {
+    padding: 10px 12px;
+  }
+  .catalog-header .item-icon {
+    width: 42px;
+    height: 42px;
+  }
+}
