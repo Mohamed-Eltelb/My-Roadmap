@@ -141,9 +141,27 @@ document.addEventListener("DOMContentLoaded", function () {
       } else {
         languageSuggestions.style.display = "block";
 
-        const suggestions = Object.keys(languageIcons)
-          .filter((key) => key.includes(val.toLowerCase()) && key !== "custom")
-          .slice(0, 5);
+        const suggestions = Object.entries(languageInfo)
+          .filter(
+            ([key, info]) =>
+              info.name.toLowerCase().includes(val.toLowerCase()) &&
+              key !== "custom" &&
+              key !== "general"
+          )
+          .sort(([keyA, infoA], [keyB, infoB]) => {
+            const nameA = infoA.name.toLowerCase();
+            const nameB = infoB.name.toLowerCase();
+            const search = val.toLowerCase();
+
+            const aStarts = nameA.startsWith(search);
+            const bStarts = nameB.startsWith(search);
+
+            if (aStarts && !bStarts) return -1;
+            if (!aStarts && bStarts) return 1;
+
+            return nameA.localeCompare(nameB);
+          })
+          .map(([key]) => key); // return only the keys (same as before)
 
         if (suggestions.length === 0) {
           // languageSuggestions.style.display = "none";
@@ -730,7 +748,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Icon
     if (detailsIcon) detailsIcon.innerHTML = iconForLanguage(item.language);
     // Name and meta
-    if (detailsName) detailsName.textContent = `${item.language || "Custom"}`;
+    if (detailsName) detailsName.textContent = `${item.title || "Custom"}`;
     const status = item.completed ? "Completed" : "In Progress";
     const created = item.createdAt
       ? new Date(item.createdAt).toLocaleString()
