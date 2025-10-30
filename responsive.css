@@ -48,6 +48,10 @@
   .hero-actions {
     gap: 8px;
   }
+  .item-actions {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
 }
 
 @media (min-width: 768px) {
@@ -67,5 +71,11 @@
   .btn-lg {
     width: 100%;
     justify-content: center;
+  }
+}
+@media (max-width: 570px) {
+  .grid-view .roadmap-item.drag-over {
+    border-bottom: 3px solid var(--accent);
+    border-right: none;
   }
 }

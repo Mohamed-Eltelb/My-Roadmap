@@ -117,12 +117,12 @@
       'asp.net': 'aspnet',
     };
     function iconFor(key) {
-      if (!key) return languageIcons.custom ?? '';
+      if (!key) return languageIcons.general ?? '';
       const norm = String(key).trim().toLowerCase();
       if (languageIcons[norm]) return languageIcons[norm];
       const aliased = aliasMap[norm];
       if (aliased && languageIcons[aliased]) return languageIcons[aliased];
-      return languageIcons.custom ?? '';
+      return languageIcons.general ?? '';
     }
 
     // Group by section and sort
@@ -152,7 +152,7 @@
           </div>
           <p class="item-desc">${desc}</p>
           <div class="catalog-actions">
-            <a class="btn btn-outline" href="${item.resources[0].docs}">
+            <a class="btn btn-outline" href="${item.resources[0].docs}" target="_blank" rel="noopener noreferrer">
             View resources
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M13.47 5.47a.75.75 0 0 1 1.06 0l6 6a.75.75 0 0 1 0 1.06l-6 6a.75.75 0 1 1-1.06-1.06l4.72-4.72H4a.75.75 0 0 1 0-1.5h14.19l-4.72-4.72a.75.75 0 0 1 0-1.06" clip-rule="evenodd"/></svg>
             </a>

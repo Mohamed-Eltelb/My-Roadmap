@@ -11,7 +11,6 @@ for (const key in languageInfo) {
     sections.push({ name: sectionName, count: 1, langs: [key] });
   }
 }
-console.log(sections);
 
 document.addEventListener("DOMContentLoaded", function () {
   // DOM Elements
@@ -154,11 +153,12 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         suggestions.forEach((suggestion) => {
           const icon = iconForLanguage(suggestion);
+          const name = getLangName(suggestion);
           const div = document.createElement("div");
           div.classList.add("suggestion");
-          div.innerHTML += `${icon} ${suggestion}`;
+          div.innerHTML += `${icon} ${name || suggestion}`;
           div.addEventListener("click", () => {
-            languageSelect.value = suggestion;
+            languageSelect.value = name || suggestion;
             languageSuggestions.innerHTML = "";
             languageSuggestions.style.display = "none";
             languageIcon.innerHTML = icon;
@@ -1006,27 +1006,42 @@ document.addEventListener("DOMContentLoaded", function () {
   function toUpperCaseFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
   }
+
+  function getLangName(language) {
+    for (const lang in languageInfo) {
+      if (lang == language) {
+        return languageInfo[lang].name;
+      }
+    }
+  }
+
+  function langFromName(name) {
+    for (const lang in languageInfo) {
+      if (languageInfo[lang].name === name) {
+        return lang;
+      }
+    }
+  }
+
   // Add a new item to the roadmap
   function addNewItem() {
     let title = document.getElementById("itemTitle").value;
     const description = document.getElementById("itemDescription").value;
-    const language = languageSelect.value;
+    const language = langFromName(languageSelect.value);
     const isValidLang = iconForLanguage(language);
-    if (!language.trim() || !isValidLang) {
+    if (!language || !isValidLang) {
       errorLog.textContent = "Please select a valid language.";
       return;
     }
-    title =
-      title.trim() !== ""
-        ? title.trim()
-        : `Learn ${toUpperCaseFirstLetter(language)}`;
+    const langName = getLangName(language) || toUpperCaseFirstLetter(language);
+    title = title.trim() !== "" ? title.trim() : `Learn ${langName}`;
 
     if (editingItemId) {
       const itemLang = items.find((it) => it.id === editingItemId)?.language;
       if (itemLang !== language) {
         const exists = items.some((it) => it.language === language);
         if (exists) {
-          errorLog.textContent = `Item with language "${language}" already exists.`;
+          errorLog.textContent = `Item with language "${langName}" already exists.`;
           return;
         }
       }
@@ -1044,7 +1059,7 @@ document.addEventListener("DOMContentLoaded", function () {
     } else {
       const exists = items.some((it) => it.language === language);
       if (exists) {
-        errorLog.textContent = `Item with language "${language}" already exists.`;
+        errorLog.textContent = `Item with language "${langName}" already exists.`;
         return;
       }
       const newItem = {
@@ -1212,6 +1227,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (submitBtn)
       submitBtn.innerHTML = '<i class="fas fa-plus"></i> Add to Roadmap';
     languageSuggestions.style.display = "none";
+    errorLog.textContent = "";
   }
 
   function isModalOpen() {
