@@ -1,9 +1,54 @@
 /* Catalog page (languages.html) */
+.sections-nav {
+  position: sticky;
+  top: 10px;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 10px 12px;
+  margin-bottom: 14px;
+  border-radius: 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+}
+
+.sections-nav .section-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--glass-border);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.sections-nav .section-link:hover {
+  background: var(--muted-surface);
+}
+
+.sections-nav .section-link.active {
+  background: linear-gradient(135deg, var(--accent), #a78bfa);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 10px 20px rgba(124, 58, 237, 0.35);
+}
+
 .catalog-container {
   display: flex;
   flex-direction: column;
   gap: 22px;
   margin: 10px 0 40px;
+}
+
+.catalog-section {
+  scroll-margin-top: 90px; /* ensure anchors land below sticky nav */
 }
 
 .catalog-section {
@@ -115,8 +160,8 @@
   justify-content: end;
 }
 
-.catalog-actions a{
-padding: 5px 8px;
+.catalog-actions a {
+  padding: 5px 8px;
 }
 .catalog-actions a svg {
   width: 20px;
