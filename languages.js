@@ -241,6 +241,24 @@ if (sectionsNav) {
     { passive: true }
   );
 
+  // Allow horizontal scrolling of the sections nav using the mouse wheel
+  sectionsNav.addEventListener(
+    "wheel",
+    (e) => {
+      // If vertical scroll is dominant, translate it into horizontal scroll for the nav
+      const horizontal = Math.abs(e.deltaX);
+      const vertical = Math.abs(e.deltaY);
+      if (vertical >= horizontal) {
+        sectionsNav.scrollLeft += e.deltaY;
+        e.preventDefault();
+      } else if (horizontal > 0) {
+        sectionsNav.scrollLeft += e.deltaX;
+        e.preventDefault();
+      }
+    },
+    { passive: false }
+  );
+
   // Click: set active early (scroll will confirm)
   links.forEach((l) =>
     l.addEventListener("click", (e) => {
@@ -253,3 +271,19 @@ if (sectionsNav) {
   // Initial state
   setActiveByScroll();
 }
+
+(function () {
+  const btn = document.getElementById("scrollTopBtn");
+  if (!btn) return;
+  const showAt = 200; // px
+  const onScroll = () => {
+    if (window.scrollY > showAt) btn.classList.add("visible");
+    else btn.classList.remove("visible");
+  };
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+  btn.addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+  
+})();
