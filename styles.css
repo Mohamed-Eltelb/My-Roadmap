@@ -263,8 +263,9 @@ header {
   animation: float 6s ease-in-out infinite;
 }
 .bubble svg {
-  width: 35px;
-  height: 35px;
+  width: 30px;
+  height: 30px;
+  border-radius: 2px;
 }
 .bubble:nth-child(1) {
   --x: 10%;
@@ -815,7 +816,8 @@ label {
 
 input,
 select,
-textarea, .custom-date-input {
+textarea,
+.custom-date-input {
   width: 100%;
   padding: 12px;
   background-color: var(--bg-card);
@@ -868,7 +870,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   opacity: 0;
   pointer-events: none;
 }
-
 
 .languages-grid {
   display: grid;

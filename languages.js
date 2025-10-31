@@ -102,13 +102,13 @@ const sectionIdMap = new Map();
 function slugify(label) {
   return label
     .toLowerCase()
-    .replace(/&/g, 'and')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '');
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
 }
 for (const s of sortedSections) {
   const base = slugify(s);
-  let id = `sec-${base || 'section'}`;
+  let id = `sec-${base || "section"}`;
   let i = 2;
   while ([...sectionIdMap.values()].includes(id)) {
     id = `sec-${base}-${i++}`;
@@ -181,7 +181,7 @@ for (const section of sortedSections) {
 
 // Active link sync with scrolling (deterministic, top-anchored)
 if (sectionsNav) {
-  const links = Array.from(sectionsNav.querySelectorAll('.section-link'));
+  const links = Array.from(sectionsNav.querySelectorAll(".section-link"));
   const linkById = new Map(links.map((a) => [a.dataset.target, a]));
   const sectionEls = sortedSections
     .map((s) => document.getElementById(sectionIdMap.get(s)))
@@ -192,10 +192,10 @@ if (sectionsNav) {
 
   function setActive(id) {
     if (!id || id === currentActive) return;
-    links.forEach((l) => l.classList.remove('active'));
+    links.forEach((l) => l.classList.remove("active"));
     const link = linkById.get(id);
     if (link) {
-      link.classList.add('active');
+      link.classList.add("active");
       scrollNavToLink(link);
     }
     currentActive = id;
@@ -207,9 +207,12 @@ if (sectionsNav) {
     const nav = sectionsNav;
     // Calculate target scrollLeft to center the link
     const target = link.offsetLeft - (nav.clientWidth - link.offsetWidth) / 2;
-    const clamped = Math.max(0, Math.min(target, nav.scrollWidth - nav.clientWidth));
+    const clamped = Math.max(
+      0,
+      Math.min(target, nav.scrollWidth - nav.clientWidth)
+    );
     if (Math.abs(nav.scrollLeft - clamped) > 4) {
-      nav.scrollTo({ left: clamped, behavior: smooth ? 'smooth' : 'auto' });
+      nav.scrollTo({ left: clamped, behavior: smooth ? "smooth" : "auto" });
     }
   }
 
@@ -225,19 +228,23 @@ if (sectionsNav) {
   }
 
   // rAF-throttled scroll spy
-  window.addEventListener('scroll', () => {
-    if (rafScheduled) return;
-    rafScheduled = true;
-    requestAnimationFrame(() => {
-      rafScheduled = false;
-      setActiveByScroll();
-    });
-  }, { passive: true });
+  window.addEventListener(
+    "scroll",
+    () => {
+      if (rafScheduled) return;
+      rafScheduled = true;
+      requestAnimationFrame(() => {
+        rafScheduled = false;
+        setActiveByScroll();
+      });
+    },
+    { passive: true }
+  );
 
   // Click: set active early (scroll will confirm)
   links.forEach((l) =>
-    l.addEventListener('click', (e) => {
-      const id = l.getAttribute('data-target');
+    l.addEventListener("click", (e) => {
+      const id = l.getAttribute("data-target");
       setActive(id);
       scrollNavToLink(l);
     })

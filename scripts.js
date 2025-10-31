@@ -343,10 +343,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
     expectedDateInput.addEventListener("change", (e) => {
       let val = e.target.value;
+      if (!val) {
+        customDatePicker.querySelector("#customDateText").textContent =
+          "MM/DD/YYYY";
+        return;
+      }
       const formatted = new Date(val).toLocaleDateString("en-US");
 
-      customDatePicker.querySelector("#customDateText").textContent =
-        formatted;
+      customDatePicker.querySelector("#customDateText").textContent = formatted;
     });
   }
 
@@ -539,7 +543,13 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     const iconHTML = iconForLanguage(item.language);
-
+    function formatDate(date) {
+      return new Date(date).toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      });
+    }
     itemDiv.innerHTML = `
                     <div class="item-header">
                         <div class="item-icon">${iconHTML}</div>
@@ -549,16 +559,18 @@ document.addEventListener("DOMContentLoaded", function () {
                               (!expired
                                 ? item.completed
                                   ? "Completed"
-                                  : "In Progress"
+                                  : `${
+                                      item.expectedBy
+                                        ? `Due by ${formatDate(
+                                            item.expectedBy
+                                          )}`
+                                        : "In Progress"
+                                    }`
                                 : "Expired") +
-                              (item.completedAt
-                                ? ` • ${new Date(
-                                    item.completedAt
-                                  ).toLocaleDateString("en-GB", {
-                                    day: "2-digit",
-                                    month: "short",
-                                    year: "numeric",
-                                  })}`
+                              (item.completedAt || expired
+                                ? ` at ${formatDate(
+                                    item.completedAt || item.expectedBy
+                                  )}`
                                 : "")
                             }</div>
                         </div>
@@ -1020,9 +1032,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function addNewItem() {
     let title = document.getElementById("itemTitle").value;
     const description = document.getElementById("itemDescription").value;
-    const expectedBy = (
-      document.getElementById("itemExpectedDate")?.value || ""
-    ).trim();
+    const expectedBy = (expectedDateInput?.value || "").trim();
     const language = langFromName(languageSelect.value);
     const isValidLang = iconForLanguage(language);
     if (!language || !isValidLang) {
@@ -1197,6 +1207,10 @@ document.addEventListener("DOMContentLoaded", function () {
     if (descriptionInput) descriptionInput.value = item.description || "";
     if (expectedDateInput)
       expectedDateInput.value = isRestart ? "" : item.expectedBy || "";
+    if (customDatePicker && item.expectedBy) {
+      const formatted = new Date(item.expectedBy).toLocaleDateString("en-US");
+      customDatePicker.querySelector("#customDateText").textContent = formatted;
+    }
     if (languageSelect) {
       languageSelect.value = getLangName(item.language) || "undefined";
       handleLanguageChange(item.language);
@@ -1232,6 +1246,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const titleEl = document.getElementById("addItemTitle");
     if (titleEl) titleEl.textContent = "Add New Item";
     languageSelect.disabled = false;
+    customDatePicker.querySelector("#customDateText").textContent =
+      "MM/DD/YYYY";
     const submitBtn = itemForm
       ? itemForm.querySelector('button[type="submit"]')
       : null;
