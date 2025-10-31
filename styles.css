@@ -815,7 +815,7 @@ label {
 
 input,
 select,
-textarea {
+textarea, .custom-date-input {
   width: 100%;
   padding: 12px;
   background-color: var(--bg-card);
@@ -855,6 +855,20 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   filter: var(--calendar-picker-filter);
   cursor: pointer;
 }
+
+.custom-date-input {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+#itemExpectedDate {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
 
 .languages-grid {
   display: grid;

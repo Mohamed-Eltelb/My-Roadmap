@@ -54,6 +54,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const detailsLinks = document.getElementById("detailsLinks");
   const floatingIcons = document.getElementById("floatingIcons");
   const expectedDateInput = document.getElementById("itemExpectedDate");
+  const customDatePicker = document.getElementById("customDate");
   let draggingId = null;
   let searchQuery = "";
   let defaultEmptyHTML = null;
@@ -334,6 +335,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
     document.getElementById("expandBtn").addEventListener("click", function () {
       this.parentElement.classList.toggle("expanded");
+    });
+
+    customDatePicker.addEventListener("click", () => {
+      expectedDateInput.showPicker();
+    });
+
+    expectedDateInput.addEventListener("change", (e) => {
+      let val = e.target.value;
+      const formatted = new Date(val).toLocaleDateString("en-US");
+
+      customDatePicker.querySelector("#customDateText").textContent =
+        formatted;
     });
   }
 
