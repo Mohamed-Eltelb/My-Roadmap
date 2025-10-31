@@ -2232,4 +2232,13 @@ export const languageInfo = {
       { docs: "https://formatjs.github.io/docs/getting-started/installation" },
     ],
   },
+
+  numpy:{
+    name: "NumPy",
+    type: "library",
+    section: "Runtime & Tooling",
+    description:
+      "NumPy is a Python library for the scientific computing with large, multi-dimensional arrays and matrices.",
+    resources: [{ docs: "https://numpy.org/" }],
+  }
 };

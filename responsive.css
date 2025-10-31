@@ -25,6 +25,9 @@
   .more-options-mobile {
     display: flex;
   }
+  .more-options {
+    display: none !important;
+  }
   .more-item {
     display: flex;
   }
@@ -34,6 +37,9 @@
   .bubble:nth-child(3) {
     --x: 5%;
     --y: 65%;
+  }
+  .bubble:nth-child(2) {
+    --x: 80%;
   }
   .icons i,
   .icons .more-icons {
@@ -77,5 +83,15 @@
   .grid-view .roadmap-item.drag-over {
     border-bottom: 3px solid var(--accent);
     border-right: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .section-header {
+    padding: 10px 12px;
+  }
+  .catalog-header .item-icon {
+    width: 42px;
+    height: 42px;
   }
 }

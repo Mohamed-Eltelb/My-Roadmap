@@ -1,15 +1,17 @@
 import { languageIcons, languageInfo } from "./languagesData.js";
 
-const sections = [];
+const icons = [];
+const keys = Object.keys(languageIcons);
 
-for (const key in languageInfo) {
-  const sectionName = languageInfo[key].section;
-  if (sections.find((section) => section.name === sectionName)) {
-    sections.find((section) => section.name === sectionName).count++;
-    sections.find((section) => section.name === sectionName).langs.push(key);
-  } else {
-    sections.push({ name: sectionName, count: 1, langs: [key] });
-  }
+for (let i = 0; i < 4; i++) {
+  let randomKey;
+
+  do {
+    randomKey = keys[Math.floor(Math.random() * keys.length)];
+  } while (randomKey === "custom" || randomKey === "general");
+
+  const icon = languageIcons[randomKey];
+  icons.push(icon);
 }
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -50,6 +52,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const detailsMeta = document.getElementById("detailsMeta");
   const detailsBody = document.getElementById("detailsBody");
   const detailsLinks = document.getElementById("detailsLinks");
+  const floatingIcons = document.getElementById("floatingIcons");
+  const expectedDateInput = document.getElementById("itemExpectedDate");
   let draggingId = null;
   let searchQuery = "";
   let defaultEmptyHTML = null;
@@ -277,6 +281,12 @@ document.addEventListener("DOMContentLoaded", function () {
         if (e.target && e.target.hasAttribute("data-close")) closeModal();
       });
     }
+
+    if (floatingIcons)
+      floatingIcons.querySelectorAll(".bubble").forEach((b, i) => {
+        b.innerHTML = icons[i];
+      });
+
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
         if (isModalOpen()) closeModal();
@@ -316,6 +326,9 @@ document.addEventListener("DOMContentLoaded", function () {
         renderItems();
       });
     }
+
+    expectedDateInput.min = new Date().toISOString().split("T")[0];
+
     document.getElementById("expandBtn").addEventListener("click", function () {
       this.parentElement.classList.toggle("expanded");
     });
@@ -489,12 +502,25 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Create a roadmap item element
   function createItemElement(item) {
+    const expired =
+      item.expectedBy &&
+      item.expectedBy !== "" &&
+      !item.completed &&
+      new Date(item.expectedBy).getTime() < Date.now()
+        ? true
+        : false;
     const itemDiv = document.createElement("div");
-    itemDiv.className = `roadmap-item ${item.completed ? "completed" : ""}`;
+    itemDiv.className = `roadmap-item ${
+      !expired ? (item.completed ? "completed" : "") : "expired"
+    }`;
     itemDiv.dataset.id = item.id;
     itemDiv.setAttribute("role", "listitem");
     itemDiv.setAttribute("aria-grabbed", "false");
     itemDiv.draggable = true;
+
+    if (expired) {
+      itemDiv.classList.add("expired");
+    }
 
     const iconHTML = iconForLanguage(item.language);
 
@@ -504,7 +530,11 @@ document.addEventListener("DOMContentLoaded", function () {
                         <div class="item-content">
                             <div class="item-title">${item.title}</div>
                             <div class="item-status">${
-                              (item.completed ? "Completed" : "In Progress") +
+                              (!expired
+                                ? item.completed
+                                  ? "Completed"
+                                  : "In Progress"
+                                : "Expired") +
                               (item.completedAt
                                 ? ` • ${new Date(
                                     item.completedAt
@@ -518,6 +548,9 @@ document.addEventListener("DOMContentLoaded", function () {
                         </div>
                     </div>
                     <div class="item-actions">
+                    ${
+                      !expired
+                        ? `
                         <button class="btn btn-outline" data-action="toggle">
                             ${
                               item.completed
@@ -541,12 +574,21 @@ document.addEventListener("DOMContentLoaded", function () {
                                 ? "Mark Incomplete"
                                 : "Mark Complete"
                             }
-                        </button>
+                        </button>`
+                        : `
+                        <button class="btn btn-outline" data-action="restart">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2S2 6.477 2 12s4.477 10 10 10m3.935-16.408a.75.75 0 0 1 .467.694v2.715a.75.75 0 0 1-.75.75H13a.75.75 0 0 1-.537-1.274l.762-.78a4.17 4.17 0 0 0-4.224 1.089c-1.668 1.707-1.668 4.483 0 6.19a4.17 4.17 0 0 0 5.998 0a4.4 4.4 0 0 0 1.208-2.472c.058-.418.39-.77.812-.77c.406 0 .742.325.703.729a5.9 5.9 0 0 1-1.65 3.562a5.67 5.67 0 0 1-8.144 0c-2.237-2.29-2.237-5.997 0-8.287a5.67 5.67 0 0 1 6.437-1.208l.75-.768a.75.75 0 0 1 .82-.17" clip-rule="evenodd"/></svg>
+                          Restart
+                        </button>`
+                    }
                         <div class="more-wrapper">
                             <button class="btn btn-outline more-btn" style="" data-action="more" aria-haspopup="true" aria-expanded="false" aria-label="More options">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M20 7H4m16 5H4m16 5H4"/></svg>
                             </button>
                             <div class="more-options" role="menu">
+                            ${
+                              !expired
+                                ? `
                                 <button class="more-item" data-action="edit" role="menuitem">
                                     <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
                                         <path d="M2.6687 11.333V8.66699C2.6687 7.74455 2.66841 7.01205 2.71655 6.42285C2.76533 5.82612 2.86699 5.31731 3.10425 4.85156L3.25854 4.57617C3.64272 3.94975 4.19392 3.43995 4.85229 3.10449L5.02905 3.02149C5.44666 2.84233 5.90133 2.75849 6.42358 2.71582C7.01272 2.66769 7.74445 2.66797 8.66675 2.66797H9.16675C9.53393 2.66797 9.83165 2.96586 9.83179 3.33301C9.83179 3.70028 9.53402 3.99805 9.16675 3.99805H8.66675C7.7226 3.99805 7.05438 3.99834 6.53198 4.04102C6.14611 4.07254 5.87277 4.12568 5.65601 4.20313L5.45581 4.28906C5.01645 4.51293 4.64872 4.85345 4.39233 5.27149L4.28979 5.45508C4.16388 5.7022 4.08381 6.01663 4.04175 6.53125C3.99906 7.05373 3.99878 7.7226 3.99878 8.66699V11.333C3.99878 12.2774 3.99906 12.9463 4.04175 13.4688C4.08381 13.9833 4.16389 14.2978 4.28979 14.5449L4.39233 14.7285C4.64871 15.1465 5.01648 15.4871 5.45581 15.7109L5.65601 15.7969C5.87276 15.8743 6.14614 15.9265 6.53198 15.958C7.05439 16.0007 7.72256 16.002 8.66675 16.002H11.3337C12.2779 16.002 12.9461 16.0007 13.4685 15.958C13.9829 15.916 14.2976 15.8367 14.5447 15.7109L14.7292 15.6074C15.147 15.3511 15.4879 14.9841 15.7117 14.5449L15.7976 14.3447C15.8751 14.128 15.9272 13.8546 15.9587 13.4688C16.0014 12.9463 16.0017 12.2774 16.0017 11.333V10.833C16.0018 10.466 16.2997 10.1681 16.6667 10.168C17.0339 10.168 17.3316 10.4659 17.3318 10.833V11.333C17.3318 12.2555 17.3331 12.9879 17.2849 13.5771C17.2422 14.0993 17.1584 14.5541 16.9792 14.9717L16.8962 15.1484C16.5609 15.8066 16.0507 16.3571 15.4246 16.7412L15.1492 16.8955C14.6833 17.1329 14.1739 17.2354 13.5769 17.2842C12.9878 17.3323 12.256 17.332 11.3337 17.332H8.66675C7.74446 17.332 7.01271 17.3323 6.42358 17.2842C5.90135 17.2415 5.44665 17.1577 5.02905 16.9785L4.85229 16.8955C4.19396 16.5601 3.64271 16.0502 3.25854 15.4238L3.10425 15.1484C2.86697 14.6827 2.76534 14.1739 2.71655 13.5771C2.66841 12.9879 2.6687 12.2555 2.6687 11.333ZM13.4646 3.11328C14.4201 2.334 15.8288 2.38969 16.7195 3.28027L16.8865 3.46485C17.6141 4.35685 17.6143 5.64423 16.8865 6.53613L16.7195 6.7207L11.6726 11.7686C11.1373 12.3039 10.4624 12.6746 9.72827 12.8408L9.41089 12.8994L7.59351 13.1582C7.38637 13.1877 7.17701 13.1187 7.02905 12.9707C6.88112 12.8227 6.81199 12.6134 6.84155 12.4063L7.10132 10.5898L7.15991 10.2715C7.3262 9.53749 7.69692 8.86241 8.23218 8.32715L13.2791 3.28027L13.4646 3.11328ZM15.7791 4.2207C15.3753 3.81702 14.7366 3.79124 14.3035 4.14453L14.2195 4.2207L9.17261 9.26856C8.81541 9.62578 8.56774 10.0756 8.45679 10.5654L8.41772 10.7773L8.28296 11.7158L9.22241 11.582L9.43433 11.543C9.92426 11.432 10.3749 11.1844 10.7322 10.8271L15.7791 5.78027L15.8552 5.69629C16.185 5.29194 16.1852 4.708 15.8552 4.30371L15.7791 4.2207Z">
@@ -554,6 +596,9 @@ document.addEventListener("DOMContentLoaded", function () {
                                     </svg>
                                     Edit
                                 </button>
+                                `
+                                : ""
+                            }
                                 <button class="more-item" data-action="delete" role="menuitem">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M3 6.524c0-.395.327-.714.73-.714h4.788c.006-.842.098-1.995.932-2.793A3.68 3.68 0 0 1 12 2a3.68 3.68 0 0 1 2.55 1.017c.834.798.926 1.951.932 2.793h4.788c.403 0 .73.32.73.714a.72.72 0 0 1-.73.714H3.73A.72.72 0 0 1 3 6.524"/><path fill="currentColor" fill-rule="evenodd" d="M11.596 22h.808c2.783 0 4.174 0 5.08-.886c.904-.886.996-2.34 1.181-5.246l.267-4.187c.1-1.577.15-2.366-.303-2.866c-.454-.5-1.22-.5-2.753-.5H8.124c-1.533 0-2.3 0-2.753.5s-.404 1.289-.303 2.866l.267 4.188c.185 2.906.277 4.36 1.182 5.245c.905.886 2.296.886 5.079.886m-1.35-9.811c-.04-.434-.408-.75-.82-.707c-.413.043-.713.43-.672.864l.5 5.263c.04.434.408.75.82.707c.413-.044.713-.43.672-.864zm4.329-.707c.412.043.713.43.671.864l-.5 5.263c-.04.434-.409.75-.82.707c-.413-.044-.713-.43-.672-.864l.5-5.264c.04-.433.409-.75.82-.707" clip-rule="evenodd"/></svg>
                                     Delete
@@ -571,12 +616,18 @@ document.addEventListener("DOMContentLoaded", function () {
                                 </button>
                             </div>
                               <div class="more-options-mobile" role="menu">
+                              ${
+                                !expired
+                                  ? `
                                 <button class="more-item" data-action="edit" role="menuitem">
                                     <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
                                         <path d="M2.6687 11.333V8.66699C2.6687 7.74455 2.66841 7.01205 2.71655 6.42285C2.76533 5.82612 2.86699 5.31731 3.10425 4.85156L3.25854 4.57617C3.64272 3.94975 4.19392 3.43995 4.85229 3.10449L5.02905 3.02149C5.44666 2.84233 5.90133 2.75849 6.42358 2.71582C7.01272 2.66769 7.74445 2.66797 8.66675 2.66797H9.16675C9.53393 2.66797 9.83165 2.96586 9.83179 3.33301C9.83179 3.70028 9.53402 3.99805 9.16675 3.99805H8.66675C7.7226 3.99805 7.05438 3.99834 6.53198 4.04102C6.14611 4.07254 5.87277 4.12568 5.65601 4.20313L5.45581 4.28906C5.01645 4.51293 4.64872 4.85345 4.39233 5.27149L4.28979 5.45508C4.16388 5.7022 4.08381 6.01663 4.04175 6.53125C3.99906 7.05373 3.99878 7.7226 3.99878 8.66699V11.333C3.99878 12.2774 3.99906 12.9463 4.04175 13.4688C4.08381 13.9833 4.16389 14.2978 4.28979 14.5449L4.39233 14.7285C4.64871 15.1465 5.01648 15.4871 5.45581 15.7109L5.65601 15.7969C5.87276 15.8743 6.14614 15.9265 6.53198 15.958C7.05439 16.0007 7.72256 16.002 8.66675 16.002H11.3337C12.2779 16.002 12.9461 16.0007 13.4685 15.958C13.9829 15.916 14.2976 15.8367 14.5447 15.7109L14.7292 15.6074C15.147 15.3511 15.4879 14.9841 15.7117 14.5449L15.7976 14.3447C15.8751 14.128 15.9272 13.8546 15.9587 13.4688C16.0014 12.9463 16.0017 12.2774 16.0017 11.333V10.833C16.0018 10.466 16.2997 10.1681 16.6667 10.168C17.0339 10.168 17.3316 10.4659 17.3318 10.833V11.333C17.3318 12.2555 17.3331 12.9879 17.2849 13.5771C17.2422 14.0993 17.1584 14.5541 16.9792 14.9717L16.8962 15.1484C16.5609 15.8066 16.0507 16.3571 15.4246 16.7412L15.1492 16.8955C14.6833 17.1329 14.1739 17.2354 13.5769 17.2842C12.9878 17.3323 12.256 17.332 11.3337 17.332H8.66675C7.74446 17.332 7.01271 17.3323 6.42358 17.2842C5.90135 17.2415 5.44665 17.1577 5.02905 16.9785L4.85229 16.8955C4.19396 16.5601 3.64271 16.0502 3.25854 15.4238L3.10425 15.1484C2.86697 14.6827 2.76534 14.1739 2.71655 13.5771C2.66841 12.9879 2.6687 12.2555 2.6687 11.333ZM13.4646 3.11328C14.4201 2.334 15.8288 2.38969 16.7195 3.28027L16.8865 3.46485C17.6141 4.35685 17.6143 5.64423 16.8865 6.53613L16.7195 6.7207L11.6726 11.7686C11.1373 12.3039 10.4624 12.6746 9.72827 12.8408L9.41089 12.8994L7.59351 13.1582C7.38637 13.1877 7.17701 13.1187 7.02905 12.9707C6.88112 12.8227 6.81199 12.6134 6.84155 12.4063L7.10132 10.5898L7.15991 10.2715C7.3262 9.53749 7.69692 8.86241 8.23218 8.32715L13.2791 3.28027L13.4646 3.11328ZM15.7791 4.2207C15.3753 3.81702 14.7366 3.79124 14.3035 4.14453L14.2195 4.2207L9.17261 9.26856C8.81541 9.62578 8.56774 10.0756 8.45679 10.5654L8.41772 10.7773L8.28296 11.7158L9.22241 11.582L9.43433 11.543C9.92426 11.432 10.3749 11.1844 10.7322 10.8271L15.7791 5.78027L15.8552 5.69629C16.185 5.29194 16.1852 4.708 15.8552 4.30371L15.7791 4.2207Z">
                                         </path>
                                     </svg>
                                 </button>
+                                `
+                                  : ""
+                              }
                                 <button class="more-item" data-action="delete" role="menuitem">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M3 6.524c0-.395.327-.714.73-.714h4.788c.006-.842.098-1.995.932-2.793A3.68 3.68 0 0 1 12 2a3.68 3.68 0 0 1 2.55 1.017c.834.798.926 1.951.932 2.793h4.788c.403 0 .73.32.73.714a.72.72 0 0 1-.73.714H3.73A.72.72 0 0 1 3 6.524"/><path fill="currentColor" fill-rule="evenodd" d="M11.596 22h.808c2.783 0 4.174 0 5.08-.886c.904-.886.996-2.34 1.181-5.246l.267-4.187c.1-1.577.15-2.366-.303-2.866c-.454-.5-1.22-.5-2.753-.5H8.124c-1.533 0-2.3 0-2.753.5s-.404 1.289-.303 2.866l.267 4.188c.185 2.906.277 4.36 1.182 5.245c.905.886 2.296.886 5.079.886m-1.35-9.811c-.04-.434-.408-.75-.82-.707c-.413.043-.713.43-.672.864l.5 5.263c.04.434.408.75.82.707c.413-.044.713-.43.672-.864zm4.329-.707c.412.043.713.43.671.864l-.5 5.263c-.04.434-.409.75-.82.707c-.413-.044-.713-.43-.672-.864l.5-5.264c.04-.433.409-.75.82-.707" clip-rule="evenodd"/></svg>
                                 </button>
@@ -601,6 +652,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const editBtn = itemDiv.querySelector('[data-action="edit"]');
     const resourcesBtn = itemDiv.querySelector('[data-action="resources"]');
     const detailsBtn = itemDiv.querySelector('[data-action="details"]');
+    const restartBtn = itemDiv.querySelector('[data-action="restart"]');
 
     const deleteBtnMobile = itemDiv.querySelector(
       '.more-options-mobile [data-action="delete"]'
@@ -615,7 +667,7 @@ document.addEventListener("DOMContentLoaded", function () {
       '.more-options-mobile [data-action="resources"]'
     );
 
-    toggleBtn.addEventListener("click", function () {
+    toggleBtn?.addEventListener("click", function () {
       toggleItemCompletion(item.id);
     });
 
@@ -634,7 +686,13 @@ document.addEventListener("DOMContentLoaded", function () {
         });
       });
     }
-
+    if (restartBtn) {
+      restartBtn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        closeAllMoreMenus();
+        openEditModal(item, true);
+      });
+    }
     if (detailsBtn) {
       [detailsBtn, detailsBtnMobile].forEach((btn) => {
         btn.addEventListener("click", function (e) {
@@ -666,7 +724,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Prevent drag initiation from action buttons
-    [toggleBtn, deleteBtn].forEach((btn) => {
+    [toggleBtn, deleteBtn].filter(Boolean).forEach((btn) => {
       btn.addEventListener("dragstart", (e) => e.stopPropagation());
     });
 
@@ -749,12 +807,31 @@ document.addEventListener("DOMContentLoaded", function () {
     if (detailsIcon) detailsIcon.innerHTML = iconForLanguage(item.language);
     // Name and meta
     if (detailsName) detailsName.textContent = `${item.title || "Custom"}`;
-    const status = item.completed ? "Completed" : "In Progress";
+    const expired =
+      item.expectedBy &&
+      item.expectedBy !== "" &&
+      !item.completed &&
+      new Date(item.expectedBy).getTime() < Date.now()
+        ? true
+        : false;
+    const status = expired
+      ? "Expired"
+      : item.completed
+      ? "Completed"
+      : "In Progress";
     const created = item.createdAt
       ? new Date(item.createdAt).toLocaleString()
       : "";
     const completed = item.completedAt
       ? new Date(item.completedAt).toLocaleString()
+      : null;
+    const expectedBy = (item.expectedBy || "").trim();
+    const expectedPretty = expectedBy
+      ? new Date(`${expectedBy}T00:00:00`).toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        })
       : null;
     if (detailsMeta) {
       //   detailsMeta.textContent = `${status}${
@@ -767,13 +844,16 @@ document.addEventListener("DOMContentLoaded", function () {
       //   const lang = (item.language || "").trim();
       //   const label = lang ? lang[0].toUpperCase() + lang.slice(1) : "Language";
       //   detailsBody.innerHTML = `Quick info about <strong>${label}</strong>. Explore the resources below to deepen your understanding.`;
-      //show the start date and completetion date
       detailsBody.innerHTML = `
 			<div class="details-card">
 				<div class="details-row">
 					<span class="label">Start Date:</span>
 					<span class="value">${created || "<em>undefined</em>"}</span>
 				</div>
+        <div class="details-row ${expired ? "expired" : ""}">
+          <span class="label">Expected Completion:</span>
+          <span class="value">${expectedPretty || "<em>Not Set</em>"}</span>
+        </div>
 				<div class="details-row">
 					<span class="label">Completion Date:</span>
 					<span class="value">${completed || "<em>Not Completed Yet</em>"}</span>
@@ -817,20 +897,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Links
     if (detailsLinks) {
-      detailsLinks.innerHTML = "";
-      //add the edit, delete, and resources buttons
-      const editBtn = document.createElement("button");
-      editBtn.innerHTML = `<svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
+      if (!expired) {
+        detailsLinks.innerHTML = "";
+        //add the edit, delete, and resources buttons
+        const editBtn = document.createElement("button");
+        editBtn.innerHTML = `<svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true">
 								<path d="M2.6687 11.333V8.66699C2.6687 7.74455 2.66841 7.01205 2.71655 6.42285C2.76533 5.82612 2.86699 5.31731 3.10425 4.85156L3.25854 4.57617C3.64272 3.94975 4.19392 3.43995 4.85229 3.10449L5.02905 3.02149C5.44666 2.84233 5.90133 2.75849 6.42358 2.71582C7.01272 2.66769 7.74445 2.66797 8.66675 2.66797H9.16675C9.53393 2.66797 9.83165 2.96586 9.83179 3.33301C9.83179 3.70028 9.53402 3.99805 9.16675 3.99805H8.66675C7.7226 3.99805 7.05438 3.99834 6.53198 4.04102C6.14611 4.07254 5.87277 4.12568 5.65601 4.20313L5.45581 4.28906C5.01645 4.51293 4.64872 4.85345 4.39233 5.27149L4.28979 5.45508C4.16388 5.7022 4.08381 6.01663 4.04175 6.53125C3.99906 7.05373 3.99878 7.7226 3.99878 8.66699V11.333C3.99878 12.2774 3.99906 12.9463 4.04175 13.4688C4.08381 13.9833 4.16389 14.2978 4.28979 14.5449L4.39233 14.7285C4.64871 15.1465 5.01648 15.4871 5.45581 15.7109L5.65601 15.7969C5.87276 15.8743 6.14614 15.9265 6.53198 15.958C7.05439 16.0007 7.72256 16.002 8.66675 16.002H11.3337C12.2779 16.002 12.9461 16.0007 13.4685 15.958C13.9829 15.916 14.2976 15.8367 14.5447 15.7109L14.7292 15.6074C15.147 15.3511 15.4879 14.9841 15.7117 14.5449L15.7976 14.3447C15.8751 14.128 15.9272 13.8546 15.9587 13.4688C16.0014 12.9463 16.0017 12.2774 16.0017 11.333V10.833C16.0018 10.466 16.2997 10.1681 16.6667 10.168C17.0339 10.168 17.3316 10.4659 17.3318 10.833V11.333C17.3318 12.2555 17.3331 12.9879 17.2849 13.5771C17.2422 14.0993 17.1584 14.5541 16.9792 14.9717L16.8962 15.1484C16.5609 15.8066 16.0507 16.3571 15.4246 16.7412L15.1492 16.8955C14.6833 17.1329 14.1739 17.2354 13.5769 17.2842C12.9878 17.3323 12.256 17.332 11.3337 17.332H8.66675C7.74446 17.332 7.01271 17.3323 6.42358 17.2842C5.90135 17.2415 5.44665 17.1577 5.02905 16.9785L4.85229 16.8955C4.19396 16.5601 3.64271 16.0502 3.25854 15.4238L3.10425 15.1484C2.86697 14.6827 2.76534 14.1739 2.71655 13.5771C2.66841 12.9879 2.6687 12.2555 2.6687 11.333ZM13.4646 3.11328C14.4201 2.334 15.8288 2.38969 16.7195 3.28027L16.8865 3.46485C17.6141 4.35685 17.6143 5.64423 16.8865 6.53613L16.7195 6.7207L11.6726 11.7686C11.1373 12.3039 10.4624 12.6746 9.72827 12.8408L9.41089 12.8994L7.59351 13.1582C7.38637 13.1877 7.17701 13.1187 7.02905 12.9707C6.88112 12.8227 6.81199 12.6134 6.84155 12.4063L7.10132 10.5898L7.15991 10.2715C7.3262 9.53749 7.69692 8.86241 8.23218 8.32715L13.2791 3.28027L13.4646 3.11328ZM15.7791 4.2207C15.3753 3.81702 14.7366 3.79124 14.3035 4.14453L14.2195 4.2207L9.17261 9.26856C8.81541 9.62578 8.56774 10.0756 8.45679 10.5654L8.41772 10.7773L8.28296 11.7158L9.22241 11.582L9.43433 11.543C9.92426 11.432 10.3749 11.1844 10.7322 10.8271L15.7791 5.78027L15.8552 5.69629C16.185 5.29194 16.1852 4.708 15.8552 4.30371L15.7791 4.2207Z">
 								</path>
                             </svg> Edit`;
-      editBtn.className = "btn btn-outline";
-      editBtn.addEventListener("click", () => {
-        closeDetailsModal();
-        openEditModal(item);
-      });
-      detailsLinks.appendChild(editBtn);
-
+        editBtn.className = "btn btn-outline";
+        editBtn.addEventListener("click", () => {
+          closeDetailsModal();
+          openEditModal(item);
+        });
+        detailsLinks.appendChild(editBtn);
+      }
       const deleteBtn = document.createElement("button");
       deleteBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M3 6.524c0-.395.327-.714.73-.714h4.788c.006-.842.098-1.995.932-2.793A3.68 3.68 0 0 1 12 2a3.68 3.68 0 0 1 2.55 1.017c.834.798.926 1.951.932 2.793h4.788c.403 0 .73.32.73.714a.72.72 0 0 1-.73.714H3.73A.72.72 0 0 1 3 6.524"/><path fill="currentColor" fill-rule="evenodd" d="M11.596 22h.808c2.783 0 4.174 0 5.08-.886c.904-.886.996-2.34 1.181-5.246l.267-4.187c.1-1.577.15-2.366-.303-2.866c-.454-.5-1.22-.5-2.753-.5H8.124c-1.533 0-2.3 0-2.753.5s-.404 1.289-.303 2.866l.267 4.188c.185 2.906.277 4.36 1.182 5.245c.905.886 2.296.886 5.079.886m-1.35-9.811c-.04-.434-.408-.75-.82-.707c-.413.043-.713.43-.672.864l.5 5.263c.04.434.408.75.82.707c.413-.044.713-.43.672-.864zm4.329-.707c.412.043.713.43.671.864l-.5 5.263c-.04.434-.409.75-.82.707c-.413-.044-.713-.43-.672-.864l.5-5.264c.04-.433.409-.75.82-.707" clip-rule="evenodd"/></svg> Delete`;
       deleteBtn.className = "btn btn-outline";
@@ -867,130 +948,6 @@ document.addEventListener("DOMContentLoaded", function () {
     detailsModal.setAttribute("aria-hidden", "true");
     document.body.classList.remove("modal-open");
     releaseFocus(detailsModal);
-  }
-
-  function buildLanguageLinks(lang) {
-    const q = encodeURIComponent(lang);
-    const links = [];
-    // Common docs
-    const map = {
-      javascript: [
-        {
-          href: "https://developer.mozilla.org/en-US/docs/Web/JavaScript",
-          label: "MDN Docs",
-        },
-        { href: "https://javascript.info/", label: "JavaScript.info" },
-      ],
-      typescript: [
-        { href: "https://www.typescriptlang.org/docs/", label: "TS Docs" },
-      ],
-      python: [{ href: "https://docs.python.org/3/", label: "Python Docs" }],
-      java: [
-        {
-          href: "https://docs.oracle.com/javase/tutorial/",
-          label: "Java Tutorials",
-        },
-      ],
-      csharp: [
-        {
-          href: "https://learn.microsoft.com/dotnet/csharp/",
-          label: "C# Docs",
-        },
-      ],
-      "c#": [
-        {
-          href: "https://learn.microsoft.com/dotnet/csharp/",
-          label: "C# Docs",
-        },
-      ],
-      "c++": [
-        { href: "https://en.cppreference.com/w/", label: "C++ Reference" },
-      ],
-      go: [{ href: "https://go.dev/doc/", label: "Go Docs" }],
-      rust: [
-        { href: "https://doc.rust-lang.org/book/", label: "The Rust Book" },
-      ],
-      php: [{ href: "https://www.php.net/docs.php", label: "PHP Docs" }],
-      ruby: [
-        {
-          href: "https://www.ruby-lang.org/en/documentation/",
-          label: "Ruby Docs",
-        },
-      ],
-      kotlin: [
-        { href: "https://kotlinlang.org/docs/home.html", label: "Kotlin Docs" },
-      ],
-      swift: [
-        {
-          href: "https://developer.apple.com/documentation/",
-          label: "Apple Docs",
-        },
-      ],
-      react: [{ href: "https://react.dev/learn", label: "React Docs" }],
-      "react-native": [
-        {
-          href: "https://reactnative.dev/docs/getting-started",
-          label: "RN Docs",
-        },
-      ],
-      vue: [
-        {
-          href: "https://vuejs.org/guide/introduction.html",
-          label: "Vue Docs",
-        },
-      ],
-      angular: [{ href: "https://angular.dev/", label: "Angular Docs" }],
-      svelte: [{ href: "https://svelte.dev/docs", label: "Svelte Docs" }],
-      nextjs: [{ href: "https://nextjs.org/docs", label: "Next.js Docs" }],
-      node: [{ href: "https://nodejs.org/en/docs", label: "Node.js Docs" }],
-      express: [{ href: "https://expressjs.com/", label: "Express Docs" }],
-      django: [
-        {
-          href: "https://docs.djangoproject.com/en/stable/",
-          label: "Django Docs",
-        },
-      ],
-      flask: [
-        {
-          href: "https://flask.palletsprojects.com/en/stable/",
-          label: "Flask Docs",
-        },
-      ],
-      spring: [
-        {
-          href: "https://spring.io/projects/spring-boot",
-          label: "Spring Boot",
-        },
-      ],
-      mongodb: [
-        { href: "https://www.mongodb.com/docs/", label: "MongoDB Docs" },
-      ],
-      postgresql: [
-        { href: "https://www.postgresql.org/docs/", label: "PostgreSQL Docs" },
-      ],
-      mysql: [{ href: "https://dev.mysql.com/doc/", label: "MySQL Docs" }],
-      sqlite: [
-        { href: "https://www.sqlite.org/docs.html", label: "SQLite Docs" },
-      ],
-      tailwind: [
-        {
-          href: "https://tailwindcss.com/docs/installation",
-          label: "Tailwind Docs",
-        },
-      ],
-      webpack: [
-        { href: "https://webpack.js.org/concepts/", label: "Webpack Docs" },
-      ],
-    };
-
-    const std = map[lang];
-    if (std && Array.isArray(std)) links.push(...std);
-    // Always add a search link
-    links.push({
-      href: `https://www.google.com/search?q=${q}+documentation`,
-      label: "Search docs",
-    });
-    return links;
   }
 
   function reorderItems(srcId, targetId) {
@@ -1045,6 +1002,9 @@ document.addEventListener("DOMContentLoaded", function () {
   function addNewItem() {
     let title = document.getElementById("itemTitle").value;
     const description = document.getElementById("itemDescription").value;
+    const expectedBy = (
+      document.getElementById("itemExpectedDate")?.value || ""
+    ).trim();
     const language = langFromName(languageSelect.value);
     const isValidLang = iconForLanguage(language);
     if (!language || !isValidLang) {
@@ -1071,6 +1031,7 @@ document.addEventListener("DOMContentLoaded", function () {
               title: title,
               language: language,
               description: description,
+              expectedBy: expectedBy || "",
             }
           : it
       );
@@ -1085,6 +1046,7 @@ document.addEventListener("DOMContentLoaded", function () {
         title: title,
         language: language,
         description: description,
+        expectedBy: expectedBy || "",
         completed: false,
         createdAt: Date.now(),
         completedAt: null,
@@ -1208,25 +1170,37 @@ document.addEventListener("DOMContentLoaded", function () {
     openModal();
   }
 
-  function openEditModal(item) {
+  function openEditModal(item, isRestart = false) {
     editingItemId = item.id;
     // prefill
     const titleInput = document.getElementById("itemTitle");
     if (titleInput) titleInput.value = item.title;
     const descriptionInput = document.getElementById("itemDescription");
     if (descriptionInput) descriptionInput.value = item.description || "";
+    if (expectedDateInput)
+      expectedDateInput.value = isRestart ? "" : item.expectedBy || "";
     if (languageSelect) {
-      languageSelect.value = item.language;
+      languageSelect.value = getLangName(item.language) || "undefined";
       handleLanguageChange(item.language);
+      if (isRestart) languageSelect.disabled = true;
     }
     // labels
     const titleEl = document.getElementById("addItemTitle");
-    if (titleEl) titleEl.textContent = "Edit Item";
+    if (titleEl) titleEl.textContent = isRestart ? "Restart Item" : "Edit Item";
+    const selectLangTitle = document.getElementById("selectLangTitle");
+    if (selectLangTitle)
+      selectLangTitle.textContent = isRestart
+        ? "Language (cannot be changed)"
+        : "Select Language";
     const submitBtn = itemForm
       ? itemForm.querySelector('button[type="submit"]')
       : null;
     if (submitBtn)
-      submitBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" d="M22 10.5V12c0 4.714 0 7.071-1.465 8.535C19.072 22 16.714 22 12 22s-7.071 0-8.536-1.465C2 19.072 2 16.714 2 12s0-7.071 1.464-8.536C4.93 2 7.286 2 12 2h1.5"/><path d="m16.652 3.455l.649-.649A2.753 2.753 0 0 1 21.194 6.7l-.65.649m-3.892-3.893s.081 1.379 1.298 2.595c1.216 1.217 2.595 1.298 2.595 1.298m-3.893-3.893L10.687 9.42c-.404.404-.606.606-.78.829q-.308.395-.524.848c-.121.255-.211.526-.392 1.068L8.412 13.9m12.133-6.552l-5.965 5.965c-.404.404-.606.606-.829.78a4.6 4.6 0 0 1-.848.524c-.255.121-.526.211-1.068.392l-1.735.579m0 0l-1.123.374a.742.742 0 0 1-.939-.94l.374-1.122m1.688 1.688L8.412 13.9"/></g></svg> Save Changes`;
+      submitBtn.innerHTML = !isRestart
+        ? `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" d="M22 10.5V12c0 4.714 0 7.071-1.465 8.535C19.072 22 16.714 22 12 22s-7.071 0-8.536-1.465C2 19.072 2 16.714 2 12s0-7.071 1.464-8.536C4.93 2 7.286 2 12 2h1.5"/><path d="m16.652 3.455l.649-.649A2.753 2.753 0 0 1 21.194 6.7l-.65.649m-3.892-3.893s.081 1.379 1.298 2.595c1.216 1.217 2.595 1.298 2.595 1.298m-3.893-3.893L10.687 9.42c-.404.404-.606.606-.78.829q-.308.395-.524.848c-.121.255-.211.526-.392 1.068L8.412 13.9m12.133-6.552l-5.965 5.965c-.404.404-.606.606-.829.78a4.6 4.6 0 0 1-.848.524c-.255.121-.526.211-1.068.392l-1.735.579m0 0l-1.123.374a.742.742 0 0 1-.939-.94l.374-1.122m1.688 1.688L8.412 13.9"/></g></svg>
+       Save Changes`
+        : ` <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M18.364 3.058a.75.75 0 0 1 .75.75V8.05a.75.75 0 0 1-.75.75h-4.243a.75.75 0 0 1 0-1.5h2.36a7.251 7.251 0 1 0 2.523 3.822a.75.75 0 1 1 1.45-.387a8.75 8.75 0 1 1-2.84-4.447v-2.48a.75.75 0 0 1 .75-.75" clip-rule="evenodd"/></svg>
+        Restart Item`;
     openModal();
   }
 
@@ -1239,6 +1213,7 @@ document.addEventListener("DOMContentLoaded", function () {
     editingItemId = null;
     const titleEl = document.getElementById("addItemTitle");
     if (titleEl) titleEl.textContent = "Add New Item";
+    languageSelect.disabled = false;
     const submitBtn = itemForm
       ? itemForm.querySelector('button[type="submit"]')
       : null;
@@ -1309,6 +1284,8 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function saveItems() {
+    // items.forEach((item) => (item.expectedBy ||= ""));
+
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
     } catch (_) {}

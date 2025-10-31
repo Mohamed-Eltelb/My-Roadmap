@@ -21,7 +21,7 @@
 .sections-nav .section-link {
   display: inline-flex;
   align-items: center;
-      min-width: fit-content;
+  min-width: fit-content;
   gap: 8px;
   padding: 6px 10px;
   border-radius: 999px;
@@ -168,14 +168,4 @@
 .catalog-actions a svg {
   width: 20px;
   height: 20px;
-}
-
-@media (max-width: 640px) {
-  .section-header {
-    padding: 10px 12px;
-  }
-  .catalog-header .item-icon {
-    width: 42px;
-    height: 42px;
-  }
 }
