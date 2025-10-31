@@ -778,7 +778,12 @@ document.addEventListener("DOMContentLoaded", function () {
       btn.addEventListener("click", function (e) {
         e.stopPropagation();
         closeAllMoreMenus();
-        window.location.href = `${window.location.origin}/learn/${item.language}`;
+        // window.location.href = `${window.location.origin}/learn/${item.language}`;
+        window.open(
+          languageInfo[item.language].resources[0].docs,
+          "_blank",
+          "noopener,noreferrer"
+        );
       });
     });
 
@@ -1039,7 +1044,11 @@ document.addEventListener("DOMContentLoaded", function () {
       resourcesBtn.className = "btn btn-outline";
       resourcesBtn.addEventListener("click", () => {
         closeDetailsModal();
-        window.location.href = `${window.location.origin}/learn/${item.language}`;
+        window.open(
+          languageInfo[item.language].resources[0].docs,
+          "_blank",
+          "noopener,noreferrer"
+        );
       });
       detailsLinks.appendChild(resourcesBtn);
     }
