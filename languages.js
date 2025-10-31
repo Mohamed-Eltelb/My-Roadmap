@@ -194,12 +194,27 @@ if (sectionsNav) {
     if (!id || id === currentActive) return;
     links.forEach((l) => l.classList.remove('active'));
     const link = linkById.get(id);
-    if (link) link.classList.add('active');
+    if (link) {
+      link.classList.add('active');
+      scrollNavToLink(link);
+    }
     currentActive = id;
   }
 
+  // Keep the active nav button visible (and roughly centered) in a horizontal nav
+  function scrollNavToLink(link, smooth = true) {
+    if (!sectionsNav || !link) return;
+    const nav = sectionsNav;
+    // Calculate target scrollLeft to center the link
+    const target = link.offsetLeft - (nav.clientWidth - link.offsetWidth) / 2;
+    const clamped = Math.max(0, Math.min(target, nav.scrollWidth - nav.clientWidth));
+    if (Math.abs(nav.scrollLeft - clamped) > 4) {
+      nav.scrollTo({ left: clamped, behavior: smooth ? 'smooth' : 'auto' });
+    }
+  }
+
   function setActiveByScroll() {
-    const offset = 90; // match sticky header/nav height
+    const offset = 100; // match sticky header/nav height
     let candidate = sectionEls[0] ? sectionEls[0].id : null;
     for (const el of sectionEls) {
       const top = el.getBoundingClientRect().top;
@@ -224,6 +239,7 @@ if (sectionsNav) {
     l.addEventListener('click', (e) => {
       const id = l.getAttribute('data-target');
       setActive(id);
+      scrollNavToLink(l);
     })
   );
 

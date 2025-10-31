@@ -1175,3 +1175,54 @@ select:focus {
   border: 1px solid var(--border);
   transition: background 0.3s ease, border-color 0.3s ease;
 }
+
+/* ==========================
+   Custom Scrollbar Styling
+   ========================== */
+:root {
+  --scrollbar-bg: rgba(15, 23, 42, 0.06);
+  --scrollbar-thumb: rgba(124, 58, 237, 0.45);
+  --scrollbar-thumb-hover: rgba(124, 58, 237, 0.75);
+}
+
+[data-theme="dark"] {
+  --scrollbar-bg: rgba(255, 255, 255, 0.06);
+  --scrollbar-thumb: rgba(139, 92, 246, 0.5);
+  --scrollbar-thumb-hover: rgba(139, 92, 246, 0.85);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
+}
+
+/* Chromium/WebKit */
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 999px;
+  border: 2px solid transparent; /* creates a gap to blend with bg */
+  background-clip: padding-box;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Tighter scrollbar for popovers/lists */
+.language-suggestions::-webkit-scrollbar {
+  width: 8px;
+}
+.language-suggestions {
+  scrollbar-width: thin;
+}
+
