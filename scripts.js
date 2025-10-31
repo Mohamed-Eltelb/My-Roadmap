@@ -327,7 +327,10 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     }
 
-    expectedDateInput.min = new Date().toISOString().split("T")[0];
+    const today = new Date();
+    today.setDate(today.getDate() + 1);
+    const minDate = today.toISOString().split("T")[0];
+    expectedDateInput.min = minDate;
 
     document.getElementById("expandBtn").addEventListener("click", function () {
       this.parentElement.classList.toggle("expanded");
